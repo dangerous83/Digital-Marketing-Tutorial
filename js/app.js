@@ -34,6 +34,8 @@
       $('#playerHost').appendChild(edHost);
       ed = new window.AIEditor(edHost, {});
       ed.on(onEditorEvent);
+      ed.opts.confirm = ask;
+      ed.opts.onDownload = showExport;
       window.dqEditor = ed; // handy for teachers/debugging
     }
     return ed;
@@ -126,6 +128,22 @@
     setTimeout(() => { const f = box.querySelector('[autofocus]') || box.querySelector('.btn'); f && f.focus(); }, 50);
     return box;
   }
+  /** in-page confirmation (browser confirm() popups are blocked in some hosts) */
+  function ask(msg, yesLabel, onYes) {
+    const box = modal(`<div class="big-badge">🤔</div><h2>Are you sure?</h2><p>${esc(msg)}</p>
+      <div class="modal-btns"><button class="btn btn-soft" data-no>Cancel</button><button class="btn btn-primary" data-yes>${esc(yesLabel || 'Yes')}</button></div>`);
+    box.querySelector('[data-no]').onclick = closeModal;
+    box.querySelector('[data-yes]').onclick = () => { closeModal(); onYes(); };
+  }
+  /** show exported files on screen too, in case the browser blocks downloads */
+  function showExport(blob, name) {
+    const url = URL.createObjectURL(blob);
+    const box = modal(`<div class="big-badge">🎉</div><h2>Your file is ready!</h2>
+      <p>If the download didn't start, <b style="color:#fff">right-click</b> (or long-press) the picture and choose <b style="color:#fff">Save image</b>.</p>
+      <div class="modal-img" style="max-width:420px;background:#fff"><img src="${url}" alt="${esc(name)}"></div>
+      <div class="modal-btns"><button class="btn btn-primary" data-ok>Done</button></div>`);
+    box.querySelector('[data-ok]').onclick = closeModal;
+  }
   function closeModal() { $('#modal').hidden = true; $('#modalBox').innerHTML = ''; }
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !$('#modal').hidden) closeModal(); });
 
@@ -157,7 +175,11 @@
   /* ============================================================ ROUTER */
   function route() {
     const h = location.hash.replace(/^#\/?/, '');
-    const [page, a, b] = h.split('/');
+    let page = 'home', a, b, m;
+    if (h.includes('/')) [page, a, b] = h.split('/'); // old-style links
+    else if ((m = h.match(/^course-(.+)$/))) { page = 'course'; a = m[1]; }
+    else if ((m = h.match(/^lesson-(.+?)(?:-s(\d+))?$/))) { page = 'lesson'; a = m[1]; b = m[2]; }
+    else if (h === 'playground') page = 'playground';
     leavePlayer();
     closeModal();
     $$('.view').forEach((v) => { v.hidden = true; });
@@ -186,7 +208,7 @@
     $('#courseGrid').innerHTML = COURSES.map((c) => {
       const p = lessonProgress(c);
       const open = c.status === 'open';
-      return `<a class="course-card${open ? '' : ' soon'}" href="#/course/${c.id}">
+      return `<a class="course-card${open ? '' : ' soon'}" href="#course-${c.id}">
         <div class="cc-img"><img src="${c.img}" alt="" loading="lazy">${open ? '' : '<span class="soon-badge">🔒 Coming soon</span>'}
           <span class="cc-app" style="background:${c.bg};color:${c.color};border-color:${c.color}">${c.short}</span></div>
         <div class="cc-body"><h3>${c.name}</h3><span class="cc-tag">${c.tag}</span>
@@ -211,9 +233,9 @@
     $('#courseHead').innerHTML = `<span class="ch-app" style="background:${c.bg};color:${c.color};border-color:${c.color}">${c.short}</span>
       <div class="ch-text"><h1>${c.name}</h1><p>${c.status === 'open' ? `${c.lessons.length} playful lessons · from zero to your first logo` : 'Coming soon — finish Illustrator first!'}</p></div>
       ${c.status === 'open' ? `<div class="ring"><svg width="92" height="92"><circle cx="46" cy="46" r="${R}" stroke="rgba(255,255,255,.1)" stroke-width="9" fill="none"/><circle cx="46" cy="46" r="${R}" stroke="url(#rg)" stroke-width="9" fill="none" stroke-linecap="round" stroke-dasharray="${L}" stroke-dashoffset="${L * (1 - p.pct / 100)}"/><defs><linearGradient id="rg"><stop offset="0" stop-color="#19C3B1"/><stop offset="1" stop-color="#22C55E"/></linearGradient></defs></svg><b>${p.pct}%</b><small>complete</small></div>
-      <a class="btn btn-primary btn-lg" href="#/lesson/${(P.last && c.lessons.some((l) => l.id === P.last.lesson) && !P.done[P.last.lesson]) ? P.last.lesson + '/' + P.last.step : nextLesson(c).id}">${p.done ? 'Continue →' : 'Start lesson 1 →'}</a>` : ''}`;
+      <a class="btn btn-primary btn-lg" href="#lesson-${(P.last && c.lessons.some((l) => l.id === P.last.lesson) && !P.done[P.last.lesson]) ? P.last.lesson + '-s' + P.last.step : nextLesson(c).id}">${p.done ? 'Continue →' : 'Start lesson 1 →'}</a>` : ''}`;
     if (c.status !== 'open') {
-      $('#roadmap').innerHTML = `<div class="rm-item" style="justify-content:center"><div class="rm-card" style="width:min(640px,100%)"><div class="rm-img"><img src="${c.img}" alt="Photo editing course coming soon"></div><div class="rm-info"><small>Coming soon</small><h3>Photoshop course is on its way! 📸</h3><p>Layers, selections, retouching and photo magic — built the same playful, hands-on way. Finish the Illustrator course to be ready!</p><div style="margin-top:14px"><a class="btn btn-primary" href="#/course/illustrator">Go to Illustrator →</a></div></div></div></div>`;
+      $('#roadmap').innerHTML = `<div class="rm-item" style="justify-content:center"><div class="rm-card" style="width:min(640px,100%)"><div class="rm-img"><img src="${c.img}" alt="Photo editing course coming soon"></div><div class="rm-info"><small>Coming soon</small><h3>Photoshop course is on its way! 📸</h3><p>Layers, selections, retouching and photo magic — built the same playful, hands-on way. Finish the Illustrator course to be ready!</p><div style="margin-top:14px"><a class="btn btn-primary" href="#course-illustrator">Go to Illustrator →</a></div></div></div></div>`;
       $('#courseExtras').innerHTML = '';
       return;
     }
@@ -223,7 +245,7 @@
       const st = (P.steps[l.id] || []).length;
       return `<div class="rm-item${done ? ' done' : ''}${isNext ? ' next' : ''}">
         <span class="rm-node">${done ? '✓' : i + 1}</span>
-        <a class="rm-card" href="#/lesson/${l.id}">
+        <a class="rm-card" href="#lesson-${l.id}">
           <div class="rm-img"><img src="${l.img}" alt="" loading="lazy"><span class="rm-status">${done ? '✓ Completed' : isNext ? '▶ Up next' : `${l.badge.icon} ${l.badge.name}`}</span></div>
           <div class="rm-info"><small>Lesson ${i + 1}${l.final ? ' · Final project' : ''}</small><h3>${l.title}</h3><p>${l.sub}</p>
             <div class="rm-meta"><span>⏱ ${l.mins} min</span><span>🧩 ${l.steps.length} steps</span><span>⭐ ${l.steps.length * XP_STEP + XP_LESSON} XP</span></div>
@@ -231,13 +253,14 @@
         </a></div>`;
     }).join('');
     $('#courseExtras').innerHTML = `
-      <a class="extra-card" href="#/playground"><span class="ei">🎨</span><div><h3>Playground</h3><p>Free drawing with all the tools + fun challenges.</p></div></a>
+      <a class="extra-card" href="#playground"><span class="ei">🎨</span><div><h3>Playground</h3><p>Free drawing with all the tools + fun challenges.</p></div></a>
       <button class="extra-card" type="button" data-open="shortcuts"><span class="ei">⌨️</span><div><h3>Shortcut cheat sheet</h3><p>All the keys pros use, on one page.</p></div></button>
       <button class="extra-card" type="button" id="resetProgress"><span class="ei">♻️</span><div><h3>Reset my progress</h3><p>Start the course again from zero.</p></div></button>`;
     $('#courseExtras [data-open="shortcuts"]').onclick = shortcutsModal;
     $('#resetProgress').onclick = () => {
-      if (!confirm('Reset all XP, badges and lesson progress?')) return;
-      Object.assign(P, { xp: 0, done: {}, steps: {}, quiz: {}, badges: {}, last: null }); save(); renderXP(); showCourse(c.id);
+      ask('Reset all XP, badges and lesson progress?', 'Reset', () => {
+        Object.assign(P, { xp: 0, done: {}, steps: {}, quiz: {}, badges: {}, last: null }); save(); renderXP(); showCourse(c.id);
+      });
     };
   }
 
@@ -247,7 +270,7 @@
 
   function showLesson(id, si) {
     const li = AI.lessons.findIndex((l) => l.id === id);
-    if (li < 0) { location.hash = '#/course/illustrator'; return; }
+    if (li < 0) { location.hash = '#course-illustrator'; return; }
     document.body.classList.add('in-player');
     $('#view-player').hidden = false;
     mountEditor($('#playerHost'));
@@ -280,7 +303,7 @@
     const step = L.steps[i];
     S.done = !step.task && !step.quiz;
     P.last = { lesson: L.id, step: i }; save();
-    if (!initial) history.replaceState(null, '', `#/lesson/${L.id}/${i}`);
+    if (!initial) try { history.replaceState(null, '', `#lesson-${L.id}-s${i}`); } catch (e) { /* frame may block */ }
     if (step.setup) step.setup(ed); else if (!initial) ed.setTemplate(null);
     ed.clearLog();
     renderStep();
@@ -424,7 +447,7 @@
       <h2>Lesson complete!</h2>
       <p>You earned the <b style="color:#fff">${L.badge.name}</b> badge. ${['Amazing work!', 'You\'re getting really good at this!', 'Designers everywhere are proud of you!'][S.li % 3]}</p>
       <div class="modal-stats"><div><b>${stepsDone}/${L.steps.length}</b><span>steps done</span></div><div><b>${P.xp}</b><span>total XP</span></div><div><b>Lv ${level()}</b><span>your level</span></div></div>
-      <div class="modal-btns"><a class="btn btn-soft" href="#/course/illustrator" data-close>Back to course</a>${next ? `<a class="btn btn-primary" href="#/lesson/${next.id}" data-close>Next: ${esc(next.title)} →</a>` : ''}</div>`);
+      <div class="modal-btns"><a class="btn btn-soft" href="#course-illustrator" data-close>Back to course</a>${next ? `<a class="btn btn-primary" href="#lesson-${next.id}" data-close>Next: ${esc(next.title)} →</a>` : ''}</div>`);
     $$('[data-close]', box).forEach((a) => a.addEventListener('click', closeModal));
   }
 
@@ -435,7 +458,8 @@
         <p>You are now an <b style="color:#fff">Illustrator Explorer</b>. Type your name for your certificate:</p>
         <input class="name-input" id="certName" maxlength="40" placeholder="Your name" value="${esc(P.name)}" autofocus>
         <img class="cert-preview" id="certImg" alt="Your certificate">
-        <div class="modal-btns"><button class="btn btn-primary" id="certDl">⬇ Download certificate</button><a class="btn btn-soft" href="#/" data-close>Home</a></div>`, { wide: false });
+        <p style="font-size:13px;margin:-6px 0 14px">Tip: if the button doesn't download, right-click the certificate → <b style="color:#fff">Save image</b>.</p>
+        <div class="modal-btns"><button class="btn btn-primary" id="certDl">⬇ Download certificate</button><a class="btn btn-soft" href="#home" data-close>Home</a></div>`, { wide: false });
       const draw = () => {
         P.name = $('#certName').value.trim(); save();
         drawCertificate(P.name || 'Awesome Designer', art, (url) => { $('#certImg').src = url; $('#certDl').dataset.url = url; });
@@ -602,7 +626,7 @@
         ${CHALLENGES.map((c, i) => `<button type="button" class="challenge${open === i ? ' on' : ''}" data-i="${i}"><span class="ce">${c.e}</span><span><h4>${c.t}</h4><p>${c.d}</p>${open === i ? `<ul class="coach-text" style="margin:8px 0 0;padding-left:18px;font-size:12.5px">${c.tips.map((t) => `<li>${t}</li>`).join('')}</ul>` : ''}</span></button>`).join('')}
         <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:14px"><button class="btn btn-soft" id="pgClear" type="button">🧹 Clear</button><button class="btn btn-primary" id="pgExport" type="button">⬇ Export PNG</button><button class="btn btn-soft" type="button" data-open="shortcuts">⌨️ Shortcuts</button></div>`;
       $$('#playBody .challenge').forEach((b) => b.addEventListener('click', () => { open = open === +b.dataset.i ? -1 : +b.dataset.i; render(); }));
-      $('#pgClear').onclick = () => { if (!ed.objs.length || confirm('Clear the whole artboard?')) { ed.reset(); ed.saveLocal(); } };
+      $('#pgClear').onclick = () => { const clear = () => { ed.reset(); ed.saveLocal(); }; if (!ed.objs.length) clear(); else ask('Clear the whole artboard?', 'Clear', clear); };
       $('#pgExport').onclick = () => ed.exportPNG();
       $('#playBody [data-open="shortcuts"]').onclick = shortcutsModal;
     };

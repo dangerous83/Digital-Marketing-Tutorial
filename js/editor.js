@@ -1684,9 +1684,11 @@
       this.act('resetWorkspace');
     }
     newDoc() {
-      if (this.objs.length && !window.confirm('Start a new empty document? Your current drawing will be cleared.')) return;
-      this.reset();
-      this.act('new');
+      const go = () => { this.reset(); this.act('new'); };
+      if (!this.objs.length) return go();
+      const msg = 'Start a new empty document? Your current drawing will be cleared.';
+      if (this.opts.confirm) this.opts.confirm(msg, 'Start new', go);
+      else if (window.confirm(msg)) go();
     }
     setProp(k, v, opts = {}) {
       const sel = this.selObjs();
@@ -2450,6 +2452,7 @@
       a.href = URL.createObjectURL(blob);
       a.download = name;
       document.body.appendChild(a); a.click(); a.remove();
+      if (this.opts.onDownload) this.opts.onDownload(blob, name);
       setTimeout(() => URL.revokeObjectURL(a.href), 2000);
     }
     exportSVG() {
