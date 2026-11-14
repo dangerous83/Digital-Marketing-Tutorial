@@ -1,20 +1,21 @@
 # DesignQuest Academy 🎨
 
 An interactive, beginner-friendly tutorial platform for graphic design.
-Students learn by **doing**. Every lesson has a built-in practice workspace that looks and works like **Adobe Illustrator**, **Adobe Photoshop** or **Adobe After Effects**.
+Students learn by **doing**. Every lesson has a built-in practice workspace that looks and works like **Adobe Illustrator**, **Adobe Photoshop**, **Adobe After Effects** or **Adobe InDesign**.
 
-> Three courses, 8 lessons each: **Adobe Illustrator** (vector: shapes, Pen tool, logos), **Adobe Photoshop** (pixels: layers, selections, retouching, posters) and **Adobe After Effects** (motion: keyframes, easing, effects, animated intros).
+> Four courses, 8 lessons each: **Adobe Illustrator** (vector: shapes, Pen tool, logos), **Adobe Photoshop** (pixels: layers, selections, retouching, posters) **Adobe After Effects** (motion: keyframes, easing, effects, animated intros) and **Adobe InDesign** (layout: frames, styles, threading, master pages, PDF).
 
 ## What's inside
 
 | Feature | What students get |
 | --- | --- |
+| 📰 **InDesign workspace simulator** | Multi-page documents with margin, column and bleed guides, Preview mode (W), text frames with word wrap and columns, placeholder text, overset text and threading via in/out ports, paragraph styles (create, apply, edit → everything updates), graphic frames with Place, Fill/Fit and Direct Selection to move the photo inside its frame, shapes, swatches with "formatting affects text", text wrap, align to page, Pages panel, A-Master with automatic page numbers, and PDF export (jsPDF) |
 | 🎬 **After Effects workspace simulator** | Composition viewer with motion paths, Timeline with layer bars, twirl-down Transform properties, stopwatches, keyframes you can select, drag and Easy Ease (F9), a draggable playhead and timecode, blue "scrubby" values, P/S/R/T/A/U shortcuts, shape and text layers, Typewriter, animation presets (Fade, Pop, Slide, Spin, Bounce, Blur In), effects (Gaussian Blur, Glow, Drop Shadow, Fill), parenting, layer timing and trimming, playback, and video export (WebM) |
 | 📷 **Photoshop workspace simulator** | Real pixel editing: layers (opacity, blend modes, drop shadow, stroke), locked Background, marquee / lasso / magic wand selections with marching ants, brush, eraser, clone stamp, spot healing, paint bucket, gradient, type layers, crop with ratios, Free Transform, adjustments (Brightness/Contrast, Hue/Saturation, Black & White, Photo Filter, Invert), filters (Gaussian Blur, Sharpen, Mosaic, Noise), History panel, open/place your own photos, export PNG/JPG |
 | 🖥️ **Illustrator workspace simulator** | Menu bar, control bar, toolbar with hidden-tool flyouts, rulers, artboard, Properties / Layers / Swatches / Color panels, status bar, keyboard shortcuts |
 | 🛠️ **Real working tools** | Selection, Direct Selection, Pen (curves + handles), Type, Line, Rectangle, Ellipse, Polygon, Star, Paintbrush, Pencil, Rotate, Eyedropper, Hand, Zoom |
 | ✨ **Real features** | Fill/Stroke, swatches, gradients, Pathfinder (Unite, Minus Front, Intersect, Exclude), Align, Arrange, Group, Lock/Hide, Drop Shadow, Blur, Undo/Redo, Smart Guides, Outline mode, Export PNG/SVG |
-| 🧑‍🏫 **Coach panel** | Short explanations in simple English, a looping animation for each idea, and a **mission** that is checked automatically |
+| 🧑‍🏫 **Coach panel** | Short explanations in simple English, a looping animation for each idea, and a **mission** that is checked automatically. Hints are switched **off** so the teacher leads the class (see `TEACHER` at the top of `js/app.js`) |
 | 👀 **Show me** | An animated "ghost cursor" demonstrates the action on the real interface |
 | 🔦 **Spotlight** | Pulsing highlight on the exact button to click |
 | 🏆 **Gamification** | XP, levels, badges, confetti, sounds, quizzes, mascot "Nibby", and a downloadable **certificate** that includes the student's own logo |
@@ -50,6 +51,26 @@ Students learn by **doing**. Every lesson has a built-in practice workspace that
 7. Layers, Timing & Parenting: a moon orbiting a planet, layer timing, duplicate, hide
 8. Final Project: a 5-second animated channel intro exported as a video
 
+### InDesign lessons
+1. Meet InDesign: the Pages panel, guides and Preview mode, the workspace
+2. Frames & Text: text frames, placeholder text, font and size, alignment
+3. Photos in Frames: picture frames, Place, Fill/Fit, Direct Selection to crop
+4. Paragraph Styles: create, apply, and edit a style so every heading updates
+5. Threading & Overset Text: out ports, threading, fixing overset text
+6. Text Wrap & Layout: wrap text around a photo, columns, align, margins
+7. Master Pages & Page Numbers: add pages, A-Master, automatic page numbers
+8. Final Project: an A4 event flyer exported as a PDF
+
+## Teacher settings
+
+Hints are turned off because the course is meant to be taught live. To change it, edit the first lines of `js/app.js`:
+
+```js
+const TEACHER = { showHints: false, showMe: true };
+```
+
+Set `showMe: false` to also hide the "Show me" demo button.
+
 ## Run it
 
 No build step is needed. It is plain HTML, CSS and JavaScript.
@@ -71,6 +92,10 @@ css/ai.css            Illustrator-style workspace styles
 js/editor.js          The Illustrator workspace simulator (tools, panels, menus)
 js/ps-editor.js       The Photoshop workspace simulator (canvas pixel editing)
 js/ae-editor.js       The After Effects workspace simulator (keyframe animation engine)
+js/id-editor.js       The InDesign workspace simulator (page layout & text engine)
+js/id-demos.js        InDesign explainer clips
+js/id-lessons.js      InDesign course content
+css/id.css            InDesign workspace styles
 js/ae-demos.js        After Effects explainer clips
 js/ae-lessons.js      After Effects course content
 css/ae.css            After Effects workspace styles
@@ -111,6 +136,7 @@ To add another course (e.g. InDesign), add an entry to `COURSES` with its lesson
 
 - Illustrations and practice photos generated with **Higgsfield, using the Nano Banana model at 1K resolution**
 - [paper.js](http://paperjs.org) (MIT license) for Pathfinder geometry
+- [jsPDF](https://github.com/parallax/jsPDF) (MIT license) for InDesign PDF export
 - Fonts from Google Fonts
 
 DesignQuest is an independent educational practice tool. It is not affiliated with or endorsed by Adobe. "Adobe", "Illustrator" and "Photoshop" are trademarks of Adobe Inc.

@@ -1,0 +1,51 @@
+/* =========================================================================
+   InDesign workspace additions (builds on css/ai.css)
+   ========================================================================= */
+.ai.id { --ai-accent: #e8307d; --ai-paste: #3a3a3a; }
+.id-logo { background: #49021f !important; color: #ff3366 !important; border-color: #ff3366 !important; }
+.id-cv { position: absolute; inset: 0; display: block; touch-action: none; }
+.id-control .ai-sel { flex: none; }
+.id-palign button.on { background: #1c1c1c; box-shadow: inset 0 0 0 1px #555; color: #fff; }
+.id-fmt { display: flex; gap: 2px; }
+.id-fmt button { width: 16px; height: 16px; font: 700 10px 'Source Sans 3', sans-serif; border: 1px solid #555 !important; color: #bbb; display: grid; place-items: center; }
+.id-fmt button.on { background: #e8307d !important; color: #fff; border-color: #e8307d !important; }
+.id-preview { margin-top: 6px; width: 30px; height: 24px; border-radius: 3px; font-size: 13px; filter: grayscale(1) brightness(1.4); }
+.id-preview.on { background: #1c1c1c; filter: none; box-shadow: inset 0 0 0 1px #e8307d; }
+.id-te { color: #000; padding: 0; line-height: 1.2; cursor: text; z-index: 6; }
+.id-te div { white-space: pre-wrap; word-wrap: break-word; }
+.id-dock { width: 278px; }
+.id-dock-a { flex: 1 1 68%; }
+.id-dock-b { flex: 1 1 32%; }
+.id-dock .ai-dtabs button { padding: 0 10px; }
+.id-overset { color: #ff6b6b; }
+.id-noerr { color: #6bd66b; }
+.id-pages { padding: 6px 10px; }
+.id-psec { color: #9a9a9a; font-size: 11px; text-transform: uppercase; letter-spacing: .5px; margin: 6px 0 4px; }
+.id-pgrid { display: flex; flex-wrap: wrap; gap: 8px; }
+.id-pg { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 4px; border-radius: 4px; color: #ccc; font-size: 11px; }
+.id-pg img { display: block; border: 1px solid #111; background: #fff; box-shadow: 0 2px 6px rgba(0,0,0,.4); }
+.id-pg.on img { outline: 2px solid #e8307d; }
+.id-pg.on { color: #fff; }
+.id-pg i { font-style: normal; color: #e8307d; font-size: 9.5px; }
+.id-pg:hover { background: #3a3a3a; }
+.id-pg.master { flex-direction: row; gap: 10px; }
+.id-styles { padding: 4px 0; }
+.id-style { display: flex; align-items: center; gap: 8px; height: 30px; padding: 0 10px; border-bottom: 1px solid #2a2a2a; cursor: pointer; }
+.id-style:hover { background: #3a3a3a; }
+.id-style.on { background: #4a2a3a; }
+.id-sprev { width: 26px; text-align: center; }
+.id-sname { flex: 1; color: #eee; font-size: 12px; }
+.id-smeta { color: #8d8d8d; font-size: 10.5px; }
+.id-swlist { display: flex; flex-direction: column; padding: 2px 8px 6px; }
+.id-sw { display: flex; align-items: center; gap: 8px; padding: 3px 4px; border-radius: 2px; text-align: left; color: #ddd; font-size: 11.5px; }
+.id-sw:hover { background: #3a3a3a; }
+.id-sw i { position: relative; width: 14px; height: 14px; border: 1px solid #111; flex: none; }
+.id-sw i.none::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to top right, transparent calc(50% - 1px), #ff2a2a calc(50% - 1px), #ff2a2a calc(50% + 1px), transparent calc(50% + 1px)); }
+.id-sdlg label span { width: 86px !important; }
+.id-sdlg select { height: 24px; background: var(--ai-input); border: 1px solid #111; border-radius: 3px; color: #ddd; }
+.id-placegrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 8px; }
+.id-placegrid button { display: flex; flex-direction: column; gap: 4px; align-items: center; padding: 6px; border-radius: 4px; background: #2e2e2e !important; border: 1px solid #444 !important; color: #ddd; font-size: 11px; }
+.id-placegrid button:hover { border-color: #e8307d !important; }
+.id-placegrid img { width: 100%; aspect-ratio: 4/3; object-fit: cover; border-radius: 2px; background: #fff; }
+.id-own { font-size: 34px; aspect-ratio: 4/3; display: grid; place-items: center; width: 100%; }
+@media (max-width: 1100px) { .id-dock { width: 230px; } }

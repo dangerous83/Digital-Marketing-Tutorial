@@ -287,7 +287,7 @@ body.in-player .nav { display: none; }
 .challenge.on { border-color: var(--orange); background: rgba(255, 122, 89, .12); }
 
 /* ---------- overlays ---------- */
-.spot { position: fixed; z-index: 90; pointer-events: none; border-radius: 8px; box-shadow: 0 0 0 3px var(--orange), 0 0 0 9999px rgba(10, 10, 30, .0); animation: spotPulse 1.3s ease-in-out infinite; transition: left .25s, top .25s, width .25s, height .25s; }
+.spot { position: fixed; z-index: 90; pointer-events: none; border-radius: 8px; box-shadow: 0 0 0 3px var(--orange), 0 0 0 0 rgba(255, 122, 89, 0); animation: spotPulse 1.3s ease-in-out infinite; transition: left .25s, top .25s, width .25s, height .25s; }
 @keyframes spotPulse { 50% { box-shadow: 0 0 0 6px rgba(255, 122, 89, .55), 0 0 22px 6px rgba(255, 122, 89, .45); } }
 .spot-label { position: absolute; left: calc(100% + 12px); top: 50%; transform: translateY(-50%); white-space: nowrap; background: var(--orange); color: #fff; font: 700 12.5px var(--font); padding: 6px 11px; border-radius: 999px; box-shadow: 0 6px 16px rgba(0, 0, 0, .4); animation: nudge 1s ease-in-out infinite; }
 .spot-label::before { content: ''; position: absolute; left: -6px; top: 50%; margin-top: -6px; border: 6px solid transparent; border-left: 0; border-right-color: var(--orange); }
@@ -381,3 +381,7 @@ body.in-player .nav { display: none; }
 
 .pg-switch .btn { padding: 8px 6px; }
 .course-grid { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+
+.course-grid { grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); }
+.pg-switch { flex-wrap: wrap; }
+.pg-switch .btn { padding: 7px 4px; font-size: 12.5px; }
