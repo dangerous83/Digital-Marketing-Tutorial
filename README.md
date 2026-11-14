@@ -1,14 +1,15 @@
 # DesignQuest Academy 🎨
 
 An interactive, beginner-friendly tutorial platform for graphic design.
-Students learn by **doing**. Every lesson has a built-in practice workspace that looks and works like **Adobe Illustrator**.
+Students learn by **doing**. Every lesson has a built-in practice workspace that looks and works like **Adobe Illustrator** or **Adobe Photoshop**.
 
-> First course: **Adobe Illustrator** (8 lessons). The next course is **Adobe Photoshop**; its course card already shows "Coming soon".
+> Two courses, 8 lessons each: **Adobe Illustrator** (vector: shapes, Pen tool, logos) and **Adobe Photoshop** (pixels: layers, selections, retouching, posters).
 
 ## What's inside
 
 | Feature | What students get |
 | --- | --- |
+| 📷 **Photoshop workspace simulator** | Real pixel editing: layers (opacity, blend modes, drop shadow, stroke), locked Background, marquee / lasso / magic wand selections with marching ants, brush, eraser, clone stamp, spot healing, paint bucket, gradient, type layers, crop with ratios, Free Transform, adjustments (Brightness/Contrast, Hue/Saturation, Black & White, Photo Filter, Invert), filters (Gaussian Blur, Sharpen, Mosaic, Noise), History panel, open/place your own photos, export PNG/JPG |
 | 🖥️ **Illustrator workspace simulator** | Menu bar, control bar, toolbar with hidden-tool flyouts, rulers, artboard, Properties / Layers / Swatches / Color panels, status bar, keyboard shortcuts |
 | 🛠️ **Real working tools** | Selection, Direct Selection, Pen (curves + handles), Type, Line, Rectangle, Ellipse, Polygon, Star, Paintbrush, Pencil, Rotate, Eyedropper, Hand, Zoom |
 | ✨ **Real features** | Fill/Stroke, swatches, gradients, Pathfinder (Unite, Minus Front, Intersect, Exclude), Align, Arrange, Group, Lock/Hide, Drop Shadow, Blur, Undo/Redo, Smart Guides, Outline mode, Export PNG/SVG |
@@ -16,7 +17,7 @@ Students learn by **doing**. Every lesson has a built-in practice workspace that
 | 👀 **Show me** | An animated "ghost cursor" demonstrates the action on the real interface |
 | 🔦 **Spotlight** | Pulsing highlight on the exact button to click |
 | 🏆 **Gamification** | XP, levels, badges, confetti, sounds, quizzes, mascot "Nibby", and a downloadable **certificate** that includes the student's own logo |
-| 🎨 **Playground** | Free drawing with all tools, 6 creative challenges, and autosave |
+| 🎨 **Playgrounds** | Free practice in both apps with 6 creative challenges each. Illustrator work autosaves, and in Photoshop students can open their own photos |
 
 ### Illustrator lessons
 1. Meet Illustrator: the workspace, vector vs. pixels, zoom
@@ -27,6 +28,16 @@ Students learn by **doing**. Every lesson has a built-in practice workspace that
 6. Layers, Order & Groups: stacking order, Layers panel, group, lock
 7. Pathfinder Magic: cloud (Unite), moon (Minus Front), leaf (Intersect), Exclude
 8. Final Project: design a "Happy Cup" café logo, then export it
+
+### Photoshop lessons
+1. Meet Photoshop: pixels, the workspace, zoom
+2. Layers 101: select, hide, move, order, opacity, unlock the Background, new layer
+3. Selections: marquee, elliptical marquee, Magic Wand, Inverse, Layer Via Copy, Lasso
+4. Brushes & Color: foreground color, brush size and hardness, eraser, paint bucket, gradient
+5. Color Adjustments: Brightness/Contrast, Hue/Saturation, History panel, Black & White, Gaussian Blur
+6. Retouching: work on a copy, Spot Healing Brush, Clone Stamp, before and after
+7. Text & Layer Styles: Type tool, fonts, Stroke, Drop Shadow, blend modes
+8. Final Project: crop to a square, place an image, Free Transform, adjust, add a title, export a "Summer Sale" post
 
 ## Run it
 
@@ -47,8 +58,13 @@ index.html            App shell (home, course map, lesson player, playground)
 css/app.css           Platform styles
 css/ai.css            Illustrator-style workspace styles
 js/editor.js          The Illustrator workspace simulator (tools, panels, menus)
+js/ps-editor.js       The Photoshop workspace simulator (canvas pixel editing)
+js/ps-photos.js       Practice photos embedded as data URIs (pixel tools work offline too)
 js/demos.js           Animated explainer clips (pure SVG, no video files)
-js/lessons.js         Course content: lessons, steps, missions, quizzes
+js/ps-demos.js        Photoshop explainer clips
+js/lessons.js         Illustrator course content: lessons, steps, missions, quizzes
+js/ps-lessons.js      Photoshop course content
+css/ps.css            Photoshop-specific workspace styles
 js/app.js             Router, progress/XP, coach, spotlight, ghost cursor, certificate
 js/vendor/            paper.js (MIT) — powers Pathfinder boolean operations
 assets/img/           Lesson illustrations (WebP)
@@ -74,11 +90,11 @@ Lessons are data in `js/lessons.js`. Each step can contain:
 }
 ```
 
-To start the Photoshop course, add its lessons to the `photoshop` entry in `COURSES` and set `status: 'open'`.
+To add another course (e.g. InDesign), add an entry to `COURSES` with its lessons and an `editor` key, and register a workspace for it in `editor()` in `js/app.js`.
 
 ## Credits
 
-- Illustrations generated with **Higgsfield, using the Nano Banana model at 1K resolution**
+- Illustrations and practice photos generated with **Higgsfield, using the Nano Banana model at 1K resolution**
 - [paper.js](http://paperjs.org) (MIT license) for Pathfinder geometry
 - Fonts from Google Fonts
 

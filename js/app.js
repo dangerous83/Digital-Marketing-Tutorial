@@ -25,26 +25,38 @@
   const save = () => { try { localStorage.setItem(KEY, JSON.stringify(P)); } catch (e) { /* storage unavailable */ } };
 
   /* ------------------------------------------------------------- editor */
-  const edHost = document.createElement('div');
-  edHost.className = 'ed-host';
-  edHost.style.cssText = 'position:absolute;inset:0;';
-  let ed = null;
-  function editor() {
-    if (!ed) {
-      $('#playerHost').appendChild(edHost);
-      ed = new window.AIEditor(edHost, {});
-      ed.on(onEditorEvent);
-      ed.opts.confirm = ask;
-      ed.opts.onDownload = showExport;
-      window.dqEditor = ed; // handy for teachers/debugging
+  // one workspace per app: 'ai' = Illustrator simulator, 'ps' = Photoshop simulator
+  const EDITORS = {};
+  let ed = null, edKind = 'ai';
+  function editor(kind = 'ai') {
+    if (!EDITORS[kind]) {
+      const host = document.createElement('div');
+      host.className = 'ed-host';
+      host.style.cssText = 'position:absolute;inset:0;';
+      $('#playerHost').appendChild(host);
+      const E = kind === 'ps' ? window.PSEditor : window.AIEditor;
+      const e = new E(host, {});
+      e._host = host;
+      e.on(onEditorEvent);
+      e.on(onEditorHelp);
+      e.opts.confirm = ask;
+      e.opts.onDownload = showExport;
+      EDITORS[kind] = e;
     }
-    return ed;
+    return EDITORS[kind];
   }
-  function mountEditor(host) {
-    editor();
-    if (edHost.parentNode !== host) host.appendChild(edHost);
-    requestAnimationFrame(() => { ed.resize(); });
+  function mountEditor(host, kind = 'ai') {
+    const e = editor(kind);
+    Object.values(EDITORS).forEach((x) => { if (x !== e && x._host.parentNode) x._host.remove(); });
+    if (e._host.parentNode !== host) host.appendChild(e._host);
+    ed = e; edKind = kind;
+    window.dqEditor = e; // handy for teachers/debugging
+    requestAnimationFrame(() => { e.resize(); });
+    return e;
   }
+  const courseById = (id) => COURSES.find((c) => c.id === id) || AI;
+  const courseOfLesson = (id) => COURSES.find((c) => c.lessons.some((l) => l.id === id));
+  const appName = (c) => c.name.replace('Adobe ', '');
 
   /* --------------------------------------------------------------- XP */
   function level() { return Math.floor(P.xp / XP_PER_LEVEL) + 1; }
@@ -147,10 +159,24 @@
   function closeModal() { $('#modal').hidden = true; $('#modalBox').innerHTML = ''; }
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !$('#modal').hidden) closeModal(); });
 
-  function shortcutsModal() {
+  function shortcutsModal(which) {
     const C = window.AIEditor.CMD, S = window.AIEditor.SHIFT, A = window.AIEditor.ALT;
     const g = (t, rows) => `<div class="sc-group"><h3>${t}</h3>${rows.map(([a, b]) => `<div class="sc-row"><span>${a}</span><span>${b.split(' ').map((k) => `<kbd>${esc(k)}</kbd>`).join(' ')}</span></div>`).join('')}</div>`;
-    modal(`<h2>⌨️ Keyboard shortcuts</h2><p>Pros use shortcuts to work fast. Start with the tools — one letter each!</p>
+    const kind = typeof which === 'string' ? which : (document.body.classList.contains('in-player') ? edKind : (location.hash.includes('photoshop') ? 'ps' : 'ai'));
+    const tabs = `<div class="sc-tabs"><button class="btn ${kind === 'ai' ? 'btn-primary' : 'btn-soft'}" data-sck="ai">Illustrator</button><button class="btn ${kind === 'ps' ? 'btn-primary' : 'btn-soft'}" data-sck="ps">Photoshop</button></div>`;
+    if (kind === 'ps') {
+      const box = modal(`<h2>⌨️ Photoshop shortcuts</h2>${tabs}<p>Learn the tool letters first — pros barely use the mouse for tools!</p>
+      <div class="sc-grid">
+        ${g('Tools', [['Move', 'V'], ['Marquee', 'M'], ['Lasso', 'L'], ['Magic Wand', 'W'], ['Crop', 'C'], ['Eyedropper', 'I'], ['Spot Healing', 'J'], ['Brush', 'B'], ['Clone Stamp', 'S'], ['Eraser', 'E'], ['Gradient / Bucket', 'G'], ['Type', 'T'], ['Hand (hold)', 'Space'], ['Zoom', 'Z']])}
+        ${g('Edit', [['Undo', C + 'Z'], ['Redo', S + C + 'Z'], ['Free Transform', C + 'T'], ['Copy', C + 'C'], ['Paste', C + 'V'], ['Fill with foreground', A + '⌫'], ['Delete pixels', 'Del']])}
+        ${g('Select', [['Select All', C + 'A'], ['Deselect', C + 'D'], ['Inverse', S + C + 'I'], ['Add to selection', 'Shift'], ['Subtract', A.replace('+', '')]])}
+        ${g('Layers', [['New layer', S + C + 'N'], ['Duplicate / Via Copy', C + 'J'], ['Merge Down', C + 'E'], ['Bring forward', C + ']'], ['Send backward', C + '['], ['Nudge (Move tool)', '← ↑ → ↓']])}
+        ${g('Brush & Color', [['Smaller / bigger brush', '[ ]'], ['Opacity 10–100%', '1 … 0'], ['Swap colors', 'X'], ['Default colors', 'D'], ['Hue/Saturation', C + 'U'], ['Invert', C + 'I'], ['Fit on screen', C + '0']])}
+      </div>`, { wide: true });
+      box.querySelectorAll('[data-sck]').forEach((b) => b.onclick = () => shortcutsModal(b.dataset.sck));
+      return;
+    }
+    const box = modal(`<h2>⌨️ Keyboard shortcuts</h2>${tabs}<p>Pros use shortcuts to work fast. Start with the tools — one letter each!</p>
       <div class="sc-grid">
         ${g('Tools', [['Selection', 'V'], ['Direct Selection', 'A'], ['Pen', 'P'], ['Type', 'T'], ['Line Segment', '\\'], ['Rectangle', 'M'], ['Ellipse', 'L'], ['Paintbrush', 'B'], ['Pencil', 'N'], ['Rotate', 'R'], ['Eyedropper', 'I'], ['Hand (hold)', 'Space'], ['Zoom', 'Z']])}
         ${g('Edit', [['Undo', C + 'Z'], ['Redo', S + C + 'Z'], ['Copy', C + 'C'], ['Paste', C + 'V'], ['Duplicate', C + 'D'], ['Delete', 'Del'], ['Select All', C + 'A'], ['Deselect', S + C + 'A']])}
@@ -158,8 +184,9 @@
         ${g('Color & View', [['Fill ⇄ Stroke', 'X'], ['Swap colors', S + 'X'], ['Default colors', 'D'], ['None', '/'], ['Fit artboard', C + '0'], ['Zoom in', C + '+'], ['Outline mode', C + 'Y'], ['Rulers', C + 'R']])}
         ${g('While drawing', [['Perfect square / circle', 'Shift'], ['Draw from center', A.replace('+', '')], ['Finish pen path', 'Enter'], ['Duplicate while moving', A.replace('+', '') + ' drag']])}
       </div>`, { wide: true });
+    box.querySelectorAll('[data-sck]').forEach((b) => b.onclick = () => shortcutsModal(b.dataset.sck));
   }
-  $$('[data-open="shortcuts"]').forEach((b) => b.addEventListener('click', shortcutsModal));
+  $$('[data-open="shortcuts"]').forEach((b) => b.addEventListener('click', () => shortcutsModal()));
 
   /* ------------------------------------------------------------- mascot */
   let sayT;
@@ -179,7 +206,7 @@
     if (h.includes('/')) [page, a, b] = h.split('/'); // old-style links
     else if ((m = h.match(/^course-(.+)$/))) { page = 'course'; a = m[1]; }
     else if ((m = h.match(/^lesson-(.+?)(?:-s(\d+))?$/))) { page = 'lesson'; a = m[1]; b = m[2]; }
-    else if (h === 'playground') page = 'playground';
+    else if (h === 'playground' || h === 'playground-photoshop') { page = 'playground'; a = h === 'playground' ? 'illustrator' : 'photoshop'; }
     leavePlayer();
     closeModal();
     $$('.view').forEach((v) => { v.hidden = true; });
@@ -187,7 +214,7 @@
     document.body.classList.remove('in-player');
     if (page === 'course') return showCourse(a || 'illustrator');
     if (page === 'lesson') return showLesson(a, parseInt(b, 10) || 0);
-    if (page === 'playground') return showPlayground();
+    if (page === 'playground') return showPlayground(a || 'illustrator');
     showHome();
   }
   window.addEventListener('hashchange', route);
@@ -213,13 +240,13 @@
           <span class="cc-app" style="background:${c.bg};color:${c.color};border-color:${c.color}">${c.short}</span></div>
         <div class="cc-body"><h3>${c.name}</h3><span class="cc-tag">${c.tag}</span>
           ${open ? `<div class="cc-meta"><div class="cc-progress"><i style="width:${p.pct}%"></i></div><span>${p.done}/${p.total} lessons</span></div>
-          <span class="btn btn-primary cc-cta">${p.done ? 'Continue' : 'Start course'} →</span>` : '<div class="cc-meta"><span>Next course — unlocks after Illustrator 🎨</span></div>'}
+          <span class="btn btn-primary cc-cta">${p.done ? 'Continue' : 'Start course'} →</span>` : '<div class="cc-meta"><span>Coming soon 🎨</span></div>'}
         </div></a>`;
     }).join('');
     renderBadges($('#badgeShelf'));
   }
   function renderBadges(el) {
-    el.innerHTML = AI.lessons.map((l) => `<div class="badge${P.badges[l.id] ? ' got' : ''}" title="${P.badges[l.id] ? 'Earned!' : 'Finish “' + esc(l.title) + '” to earn'}"><span class="bi">${l.badge.icon}</span><div class="bn">${l.badge.name}</div></div>`).join('');
+    el.innerHTML = COURSES.filter((c) => c.lessons.length).map((c) => `<div class="badge-group"><h3 class="badge-course"><span class="cc-mini" style="background:${c.bg};color:${c.color};border-color:${c.color}">${c.short}</span>${c.name}</h3><div class="badge-row">${c.lessons.map((l) => `<div class="badge${P.badges[l.id] ? ' got' : ''}" title="${P.badges[l.id] ? 'Earned!' : 'Finish “' + esc(l.title) + '” to earn'}"><span class="bi">${l.badge.icon}</span><div class="bn">${l.badge.name}</div></div>`).join('')}</div></div>`).join('');
   }
 
   /* ============================================================ COURSE */
@@ -231,7 +258,7 @@
     const p = lessonProgress(c);
     const R = 40, L = 2 * Math.PI * R;
     $('#courseHead').innerHTML = `<span class="ch-app" style="background:${c.bg};color:${c.color};border-color:${c.color}">${c.short}</span>
-      <div class="ch-text"><h1>${c.name}</h1><p>${c.status === 'open' ? `${c.lessons.length} playful lessons · from zero to your first logo` : 'Coming soon — finish Illustrator first!'}</p></div>
+      <div class="ch-text"><h1>${c.name}</h1><p>${c.status === 'open' ? `${c.lessons.length} playful lessons · ${c.id === 'photoshop' ? 'from zero to your first social media poster' : 'from zero to your first logo'}` : 'Coming soon!'}</p></div>
       ${c.status === 'open' ? `<div class="ring"><svg width="92" height="92"><circle cx="46" cy="46" r="${R}" stroke="rgba(255,255,255,.1)" stroke-width="9" fill="none"/><circle cx="46" cy="46" r="${R}" stroke="url(#rg)" stroke-width="9" fill="none" stroke-linecap="round" stroke-dasharray="${L}" stroke-dashoffset="${L * (1 - p.pct / 100)}"/><defs><linearGradient id="rg"><stop offset="0" stop-color="#19C3B1"/><stop offset="1" stop-color="#22C55E"/></linearGradient></defs></svg><b>${p.pct}%</b><small>complete</small></div>
       <a class="btn btn-primary btn-lg" href="#lesson-${(P.last && c.lessons.some((l) => l.id === P.last.lesson) && !P.done[P.last.lesson]) ? P.last.lesson + '-s' + P.last.step : nextLesson(c).id}">${p.done ? 'Continue →' : 'Start lesson 1 →'}</a>` : ''}`;
     if (c.status !== 'open') {
@@ -253,10 +280,10 @@
         </a></div>`;
     }).join('');
     $('#courseExtras').innerHTML = `
-      <a class="extra-card" href="#playground"><span class="ei">🎨</span><div><h3>Playground</h3><p>Free drawing with all the tools + fun challenges.</p></div></a>
+      <a class="extra-card" href="#${c.id === 'photoshop' ? 'playground-photoshop' : 'playground'}"><span class="ei">${c.id === 'photoshop' ? '📷' : '🎨'}</span><div><h3>${appName(c)} Playground</h3><p>${c.id === 'photoshop' ? 'Edit any photo — even your own — with all the tools.' : 'Free drawing with all the tools + fun challenges.'}</p></div></a>
       <button class="extra-card" type="button" data-open="shortcuts"><span class="ei">⌨️</span><div><h3>Shortcut cheat sheet</h3><p>All the keys pros use, on one page.</p></div></button>
       <button class="extra-card" type="button" id="resetProgress"><span class="ei">♻️</span><div><h3>Reset my progress</h3><p>Start the course again from zero.</p></div></button>`;
-    $('#courseExtras [data-open="shortcuts"]').onclick = shortcutsModal;
+    $('#courseExtras [data-open="shortcuts"]').onclick = () => shortcutsModal(c.editor || 'ai');
     $('#resetProgress').onclick = () => {
       ask('Reset all XP, badges and lesson progress?', 'Reset', () => {
         Object.assign(P, { xp: 0, done: {}, steps: {}, quiz: {}, badges: {}, last: null }); save(); renderXP(); showCourse(c.id);
@@ -269,17 +296,20 @@
   let spotTimer = 0;
 
   function showLesson(id, si) {
-    const li = AI.lessons.findIndex((l) => l.id === id);
-    if (li < 0) { location.hash = '#course-illustrator'; return; }
+    const course = courseOfLesson(id);
+    if (!course) { location.hash = '#course-illustrator'; return; }
+    const li = course.lessons.findIndex((l) => l.id === id);
     document.body.classList.add('in-player');
     $('#view-player').hidden = false;
-    mountEditor($('#playerHost'));
+    const kind = course.editor || 'ai';
+    const fresh = S.lesson !== course.lessons[li] || edKind !== kind || !ed;
+    mountEditor($('#playerHost'), kind);
     ed.opts.storageKey = null;
-    const lesson = AI.lessons[li];
-    const fresh = S.lesson !== lesson;
-    S.lesson = lesson; S.li = li;
+    const lesson = course.lessons[li];
+    S.lesson = lesson; S.li = li; S.course = course;
     document.title = `${lesson.title} · DesignQuest`;
-    $('#coachLessonNum').textContent = `Lesson ${li + 1} of ${AI.lessons.length}`;
+    $('#view-player .coach-back').href = `#course-${course.id}`;
+    $('#coachLessonNum').textContent = `${appName(course)} · Lesson ${li + 1} of ${course.lessons.length}`;
     $('#coachLessonTitle').textContent = lesson.title;
     if (fresh || si === 0) { ed.setTemplate(null); lesson.setup && lesson.setup(ed); }
     goStep(Math.min(si, lesson.steps.length - 1), true);
@@ -401,7 +431,8 @@
     }
   }
 
-  function onEditorEvent(ev) {
+  function onEditorEvent(ev, src) {
+    if (src && src !== ed) return;
     if (!S.lesson || $('#view-player').hidden) return;
     const step = S.lesson.steps[S.si];
     if (!step || !step.task || S.done || S.ghosting) return;
@@ -440,26 +471,28 @@
     confetti(innerWidth / 2, innerHeight / 3, 140, 1.4);
     setTimeout(() => confetti(innerWidth / 4, innerHeight / 2, 70), 300);
     setTimeout(() => confetti((innerWidth * 3) / 4, innerHeight / 2, 70), 500);
-    if (L.final) return certificateModal();
-    const next = AI.lessons[S.li + 1];
+    if (L.final) return certificateModal(S.course);
+    const next = S.course.lessons[S.li + 1];
     const stepsDone = (P.steps[L.id] || []).length;
     const box = modal(`<div class="big-badge">${L.badge.icon}</div>
       <h2>Lesson complete!</h2>
       <p>You earned the <b style="color:#fff">${L.badge.name}</b> badge. ${['Amazing work!', 'You\'re getting really good at this!', 'Designers everywhere are proud of you!'][S.li % 3]}</p>
       <div class="modal-stats"><div><b>${stepsDone}/${L.steps.length}</b><span>steps done</span></div><div><b>${P.xp}</b><span>total XP</span></div><div><b>Lv ${level()}</b><span>your level</span></div></div>
-      <div class="modal-btns"><a class="btn btn-soft" href="#course-illustrator" data-close>Back to course</a>${next ? `<a class="btn btn-primary" href="#lesson-${next.id}" data-close>Next: ${esc(next.title)} →</a>` : ''}</div>`);
+      <div class="modal-btns"><a class="btn btn-soft" href="#course-${S.course.id}" data-close>Back to course</a>${next ? `<a class="btn btn-primary" href="#lesson-${next.id}" data-close>Next: ${esc(next.title)} →</a>` : ''}</div>`);
     $$('[data-close]', box).forEach((a) => a.addEventListener('click', closeModal));
   }
 
   /* --------------------------------------------------------- certificate */
-  function certificateModal() {
+  function certificateModal(course) {
+    S.certCourse = course || AI;
+    const other = COURSES.find((c) => c !== S.certCourse && c.status === 'open' && c.lessons.some((l) => !P.done[l.id]));
     ed.snapshotDataURL((art) => {
       const box = modal(`<div class="big-badge">🏆</div><h2>You finished the course!</h2>
-        <p>You are now an <b style="color:#fff">Illustrator Explorer</b>. Type your name for your certificate:</p>
+        <p>You are now a certified <b style="color:#fff">${appName(S.certCourse)} Explorer</b>. Type your name for your certificate:</p>
         <input class="name-input" id="certName" maxlength="40" placeholder="Your name" value="${esc(P.name)}" autofocus>
         <img class="cert-preview" id="certImg" alt="Your certificate">
         <p style="font-size:13px;margin:-6px 0 14px">Tip: if the button doesn't download, right-click the certificate → <b style="color:#fff">Save image</b>.</p>
-        <div class="modal-btns"><button class="btn btn-primary" id="certDl">⬇ Download certificate</button><a class="btn btn-soft" href="#home" data-close>Home</a></div>`, { wide: false });
+        <div class="modal-btns"><button class="btn btn-primary" id="certDl">⬇ Download certificate</button>${other ? `<a class="btn btn-good" href="#course-${other.id}" data-close>Next: ${other.name} →</a>` : ''}<a class="btn btn-soft" href="#home" data-close>Home</a></div>`, { wide: false });
       const draw = () => {
         P.name = $('#certName').value.trim(); save();
         drawCertificate(P.name || 'Awesome Designer', art, (url) => { $('#certImg').src = url; $('#certDl').dataset.url = url; });
@@ -493,10 +526,10 @@
     let fs = 92; while (g.measureText(name).width > 820 && fs > 40) { fs -= 4; g.font = `400 ${fs}px Pacifico, cursive`; }
     g.fillText(name, W / 2 - 220, 500);
     g.strokeStyle = '#e4e2f2'; g.lineWidth = 3; g.beginPath(); g.moveTo(220, 535); g.lineTo(W - 660, 535); g.stroke();
-    g.fillStyle = '#1d1b2e'; g.font = '600 34px Poppins, sans-serif'; g.fillText('for completing the Adobe Illustrator Basics course', W / 2 - 220, 610);
-    g.fillStyle = '#7a7896'; g.font = '400 26px Poppins, sans-serif'; g.fillText('Shapes · Color · Pen Tool · Type · Layers · Pathfinder · Logo Design', W / 2 - 220, 660);
+    g.fillStyle = '#1d1b2e'; g.font = '600 34px Poppins, sans-serif'; g.fillText(`for completing the ${(S.certCourse || AI).name} Basics course`, W / 2 - 220, 610);
+    g.fillStyle = '#7a7896'; g.font = '400 26px Poppins, sans-serif'; g.fillText((S.certCourse || AI).id === 'photoshop' ? 'Layers · Selections · Brushes · Adjustments · Retouching · Type · Crop' : 'Shapes · Color · Pen Tool · Type · Layers · Pathfinder · Logo Design', W / 2 - 220, 660);
     g.font = '56px serif';
-    AI.lessons.forEach((l, i) => { g.fillText(l.badge.icon, 250 + i * 88, 790); });
+    (S.certCourse || AI).lessons.forEach((l, i) => { g.fillText(l.badge.icon, 250 + i * 88, 790); });
     g.fillStyle = '#7a7896'; g.font = '500 24px Poppins, sans-serif';
     g.fillText(new Date().toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' }), 380, 930);
     g.fillText('Nibby · Head Coach', W - 900, 930);
@@ -591,11 +624,12 @@
       }
       await sleep(700);
     } finally {
+      const aborted = !S.ghosting; // leaving the lesson stops the demo
       g.hidden = true;
       key.hidden = true;
       S.ghosting = false;
       ed.closeMenu(); ed.closeFlyout();
-      say('Now you try! 😊', 2400);
+      if (!aborted) say('Now you try! 😊', 2400);
       updateSpot();
     }
   }
@@ -609,26 +643,40 @@
     { e: '🌙', t: 'Night sky', d: 'A moon made with Minus Front, plus stars of different sizes.', tips: ['Two circles → select both → Pathfinder › Minus Front.', 'Star tool: drag to draw, then copy and paste more.', 'A dark rectangle background — lock it with ' + window.AIEditor.CMD + '2.'] },
     { e: '🪧', t: 'Name poster', d: 'Your name in a big fun font on a gradient background.', tips: ['Type tool → type → pick Bebas Neue or Pacifico.', 'Gradient swatch on a big rectangle, Send to Back.', 'Add a Drop Shadow to the text.'] },
   ];
-  function showPlayground() {
+  const PS_CHALLENGES = [
+    { e: '📷', t: 'Edit your own photo', d: 'Open a photo from your computer and make it look amazing.', tips: ['File › Open Your Photo…', 'Brightness/Contrast + Hue/Saturation to make it pop.', 'Crop it to a square for Instagram (C, ratio 1:1).'] },
+    { e: '🎈', t: 'Balloon cut-out', d: 'Cut the balloon out of the sky and put it on the beach.', tips: ['File › Place Sample › Hot Air Balloon.', 'Magic Wand on the sky → Select › Inverse → ' + window.PSEditor.CMD + 'J.', 'Delete the old balloon layer and Free Transform the cut-out.'] },
+    { e: '🦩', t: 'Flamingo party', d: 'Fill the beach with flamingos of different sizes.', tips: ['File › Place Sample › Flamingo.', window.PSEditor.CMD + 'J to duplicate, then ' + window.PSEditor.CMD + 'T to resize and rotate.', 'Flip one with Edit › Transform › Flip Horizontal.'] },
+    { e: '🌈', t: 'Pop-art colors', d: 'Crazy colors with Hue/Saturation and the Mosaic filter.', tips: ['Select half the photo with the Marquee.', 'Hue/Saturation → move Hue a lot.', 'Filter › Pixelate › Mosaic for a pixel-art look.'] },
+    { e: '⚫', t: 'One color pop', d: 'Everything black & white except one object.', tips: ['Select the object (Lasso or Magic Wand).', 'Select › Inverse.', 'Image › Adjustments › Black & White.'] },
+    { e: '🪧', t: 'Social media post', d: 'A square post with a bold title and a sticker.', tips: ['Crop 1:1.', 'Type tool + Bebas Neue + Stroke style.', 'Paint a circle sticker on a new layer with the Brush.'] },
+  ];
+  function showPlayground(courseId = 'illustrator') {
+    const isPS = courseId === 'photoshop';
     document.body.classList.add('in-player');
     $('#view-playground').hidden = false;
-    document.title = 'Playground · DesignQuest';
-    mountEditor($('#playHost'));
+    document.title = (isPS ? 'Photoshop' : 'Illustrator') + ' Playground · DesignQuest';
+    mountEditor($('#playHost'), isPS ? 'ps' : 'ai');
     S.lesson = null;
-    ed.opts.storageKey = null;
-    ed.reset();
-    ed.opts.storageKey = 'dq-playground';
-    ed.loadLocal();
+    if (isPS) ed.reset({ photo: 'landscape', name: 'my-photo' });
+    else {
+      ed.opts.storageKey = null;
+      ed.reset();
+      ed.opts.storageKey = 'dq-playground';
+      ed.loadLocal();
+    }
     ed.fit();
+    const list = isPS ? PS_CHALLENGES : CHALLENGES;
     let open = -1;
     const render = () => {
-      $('#playBody').innerHTML = `<p class="coach-text" style="margin-top:4px">Draw anything you like! Your work is <b>saved automatically</b> in this browser. Need ideas? Pick a challenge:</p>
-        ${CHALLENGES.map((c, i) => `<button type="button" class="challenge${open === i ? ' on' : ''}" data-i="${i}"><span class="ce">${c.e}</span><span><h4>${c.t}</h4><p>${c.d}</p>${open === i ? `<ul class="coach-text" style="margin:8px 0 0;padding-left:18px;font-size:12.5px">${c.tips.map((t) => `<li>${t}</li>`).join('')}</ul>` : ''}</span></button>`).join('')}
+      $('#playBody').innerHTML = `<div class="pg-switch"><a class="btn ${isPS ? 'btn-soft' : 'btn-primary'}" href="#playground">✏️ Illustrator</a><a class="btn ${isPS ? 'btn-primary' : 'btn-soft'}" href="#playground-photoshop">📷 Photoshop</a></div>
+        <p class="coach-text" style="margin-top:4px">${isPS ? 'Edit any photo you like — try <b>File › Open Your Photo</b> to use your own! Need ideas? Pick a challenge:' : 'Draw anything you like! Your work is <b>saved automatically</b> in this browser. Need ideas? Pick a challenge:'}</p>
+        ${list.map((c, i) => `<button type="button" class="challenge${open === i ? ' on' : ''}" data-i="${i}"><span class="ce">${c.e}</span><span><h4>${c.t}</h4><p>${c.d}</p>${open === i ? `<ul class="coach-text" style="margin:8px 0 0;padding-left:18px;font-size:12.5px">${c.tips.map((t) => `<li>${t}</li>`).join('')}</ul>` : ''}</span></button>`).join('')}
         <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:14px"><button class="btn btn-soft" id="pgClear" type="button">🧹 Clear</button><button class="btn btn-primary" id="pgExport" type="button">⬇ Export PNG</button><button class="btn btn-soft" type="button" data-open="shortcuts">⌨️ Shortcuts</button></div>`;
       $$('#playBody .challenge').forEach((b) => b.addEventListener('click', () => { open = open === +b.dataset.i ? -1 : +b.dataset.i; render(); }));
-      $('#pgClear').onclick = () => { const clear = () => { ed.reset(); ed.saveLocal(); }; if (!ed.objs.length) clear(); else ask('Clear the whole artboard?', 'Clear', clear); };
+      $('#pgClear').onclick = () => { const clear = () => { if (isPS) ed.reset({ w: 1000, h: 700, name: 'Untitled-1' }); else { ed.reset(); ed.saveLocal(); } }; if (!ed.objs.length && !isPS) clear(); else ask(isPS ? 'Start over with an empty white canvas?' : 'Clear the whole artboard?', 'Clear', clear); };
       $('#pgExport').onclick = () => ed.exportPNG();
-      $('#playBody [data-open="shortcuts"]').onclick = shortcutsModal;
+      $('#playBody [data-open="shortcuts"]').onclick = () => shortcutsModal(isPS ? 'ps' : 'ai');
     };
     render();
     maybeSmallScreen();
@@ -645,17 +693,13 @@
   window.addEventListener('resize', () => { if (!$('#view-player').hidden) updateSpot(); });
 
   // editor "Help" menu
-  function bindHelp() {
-    editor().on((ev) => {
-      if (ev.type === 'help') {
-        if (ev.what === 'shortcuts') shortcutsModal();
-        else modal(`<div class="big-badge">🖋️</div><h2>Need help?</h2><p>Hover any tool to see what it does. In lessons, use the <b>💡 Hint</b> and <b>👀 Show me</b> buttons in the coach panel.</p><div class="modal-btns"><button class="btn btn-primary" data-x>Got it!</button></div>`).querySelector('[data-x]').onclick = closeModal;
-      }
-    });
+  function onEditorHelp(ev, src) {
+    if (ev.type !== 'help') return;
+    if (ev.what === 'shortcuts') shortcutsModal(src instanceof window.PSEditor ? 'ps' : 'ai');
+    else modal(`<div class="big-badge">🖋️</div><h2>Need help?</h2><p>Hover any tool to see what it does. In lessons, use the <b>💡 Hint</b> and <b>👀 Show me</b> buttons in the coach panel.</p><div class="modal-btns"><button class="btn btn-primary" data-x>Got it!</button></div>`).querySelector('[data-x]').onclick = closeModal;
   }
 
   /* --------------------------------------------------------------- boot */
   renderXP();
-  bindHelp();
   route();
 })();

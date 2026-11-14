@@ -368,3 +368,13 @@ body.in-player .nav { display: none; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
 }
+
+/* ---------- multi-course additions ---------- */
+.badge-shelf { display: flex; flex-direction: column; gap: 22px; }
+.badge-group h3.badge-course { display: flex; align-items: center; gap: 10px; margin: 0 0 12px; font-size: 16px; }
+.cc-mini { width: 28px; height: 28px; border-radius: 7px; display: grid; place-items: center; font: 700 13px/1 'Source Sans 3', sans-serif; border: 2px solid; }
+.badge-row { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 14px; }
+.pg-switch { display: flex; gap: 8px; margin: 4px 0 12px; }
+.pg-switch .btn { flex: 1; padding: 8px 10px; font-size: 13px; }
+.sc-tabs { display: flex; gap: 8px; margin: 6px 0 10px; }
+.sc-tabs .btn { padding: 7px 16px; font-size: 13px; }

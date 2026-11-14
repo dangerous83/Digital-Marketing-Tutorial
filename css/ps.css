@@ -1,0 +1,116 @@
+/* =========================================================================
+   Photoshop workspace additions (builds on css/ai.css)
+   ========================================================================= */
+.ai.ps { --ai-accent: #2f8ef0; --ai-paste: #232323; }
+.ps-logo { background: #001e36 !important; color: #31a8ff !important; border-color: #31a8ff !important; }
+.ps-view, .ps-ov { position: absolute; inset: 0; display: block; }
+.ps-ov { touch-action: none; }
+
+/* options bar */
+.ps-options { gap: 10px; }
+.ps-oicon { display: grid; place-items: center; width: 30px; height: 24px; border-radius: 3px; background: #262626; color: #ddd; border: 1px solid #444; }
+.ps-oitem input[type=range].ps-orange { width: 80px; accent-color: #bbb; }
+.ps-oitem .ai-num { width: 50px; }
+.ps-check { display: inline-flex; align-items: center; gap: 5px; color: #ccc; cursor: pointer; }
+.ps-check input { accent-color: #2f8ef0; }
+.ps-obtn { height: 24px; padding: 0 10px; border-radius: 12px; background: #3b3b3b !important; border: 1px solid #555 !important; color: #ddd; font-size: 11.5px; }
+.ps-obtn:hover { background: #474747 !important; }
+.ps-hintline { color: #9b9b9b; font-size: 11.5px; white-space: nowrap; }
+.ps-hintline b { color: #ddd; }
+.ps-selmodes { display: inline-flex; gap: 2px; }
+.ps-selmodes button { width: 26px; height: 24px; border-radius: 3px; color: #ccc; font-size: 15px; }
+.ps-selmodes button.on { background: #1c1c1c; box-shadow: inset 0 0 0 1px #555; color: #fff; }
+.ps-ok { width: 32px; height: 26px; border-radius: 4px; background: #2f8ef0 !important; color: #fff; font-size: 16px; font-weight: 700; }
+.ps-ok.cancel { background: #4a4a4a !important; }
+.ps-xfinfo { color: #ccc; font-size: 12px; }
+.ps-gradprev { width: 90px; height: 18px; border: 1px solid #111; border-radius: 2px; }
+.ps-ratio { max-width: 150px; flex: none !important; }
+
+/* toolbar colors */
+.ps-colors { position: relative; width: 38px; height: 40px; margin-top: 10px; padding-top: 6px; border-top: 1px solid var(--ai-line-2); flex: none; }
+.ps-sw { position: absolute; width: 22px; height: 22px; border: 1px solid #0d0d0d !important; box-shadow: inset 0 0 0 1px rgba(255,255,255,.5); }
+.ps-fg { left: 2px; top: 6px; z-index: 2; }
+.ps-bg { right: 0; top: 18px; z-index: 1; }
+.ps-swap { position: absolute; right: -2px; top: 2px; font-size: 10px; color: #bbb; }
+.ps-def { position: absolute; left: -1px; top: 32px; width: 11px; height: 11px; }
+.ps-def span { position: absolute; width: 7px; height: 7px; border: 1px solid #ccc; }
+.ps-def span:first-child { left: 0; top: 0; background: #000; z-index: 1; }
+.ps-def span:last-child { right: 0; bottom: 0; background: #fff; }
+.ps-pick { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; left: 0; top: 0; }
+
+/* dock: three groups like Photoshop's Essentials */
+.ps-dock { width: 286px; }
+.ps-dock-a { flex: 0 0 auto; border-bottom: 2px solid var(--ai-line); }
+.ps-dock-a .ai-dbody { max-height: 124px; }
+.ps-dock-b { flex: 1 1 42%; border-bottom: 2px solid var(--ai-line); min-height: 0; }
+.ps-dock-c { flex: 1 1 58%; min-height: 0; display: flex; flex-direction: column; }
+.ps-dock-c .ai-dbody { display: flex; flex-direction: column; }
+
+.ps-colorpanel { display: flex; gap: 10px; padding: 10px 12px; }
+.ps-cchips { position: relative; width: 44px; height: 44px; flex: none; }
+.ps-cchip { position: absolute; width: 28px; height: 28px; border: 1px solid #0d0d0d !important; box-shadow: inset 0 0 0 1px rgba(255,255,255,.5); }
+.ps-cchip.fg { left: 0; top: 0; z-index: 2; }
+.ps-cchip.bg { right: 0; bottom: 0; }
+.ps-cright { flex: 1; min-width: 0; }
+.ps-spec { height: 44px; margin: 0 0 6px; }
+.ps-cright .ai-in { width: 70px; }
+.ps-swgrid { grid-template-columns: repeat(10, 1fr); }
+
+.ps-note { color: #a8a8a8; font-size: 11.5px; margin: 0 0 8px; line-height: 1.45; }
+.ps-lname { font-weight: 400; color: #bbb; margin-left: 4px; }
+.ps-adjgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(70px, 1fr)); gap: 4px; }
+.ps-adjgrid button { display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 8px 4px; border-radius: 4px; background: #3a3a3a !important; border: 1px solid #4a4a4a !important; }
+.ps-adjgrid button:hover { background: #474747 !important; border-color: #2f8ef0 !important; }
+.ps-adjgrid span { font-size: 17px; filter: grayscale(.2); }
+.ps-adjgrid small { font-size: 9.5px; color: #bbb; text-align: center; line-height: 1.15; }
+
+/* layers */
+.ps-ltop { display: flex; align-items: center; gap: 6px; padding: 7px 8px 4px; color: #aaa; }
+.ps-ltop .ai-sel { flex: 1; }
+.ps-opn { width: 46px !important; }
+.ps-ltop2 { padding: 0 8px 6px; }
+.ps-ltop2 input { width: 100%; accent-color: #aaa; height: 12px; }
+.ps-layers { flex: 1; overflow-y: auto; border-top: 1px solid var(--ai-line); min-height: 60px; }
+.ps-lrow { display: flex; align-items: center; height: 40px; border-bottom: 1px solid #2a2a2a; padding-right: 8px; cursor: default; }
+.ps-lrow:hover { background: #3a3a3a; }
+.ps-lrow.sel { background: #505050; }
+.ps-lrow.dragging { opacity: .4; }
+.ps-lrow.dropto { box-shadow: inset 0 -2px 0 #2f8ef0; }
+.ps-eye { width: 28px; height: 40px; display: grid; place-items: center; font-size: 11px; flex: none; filter: grayscale(1) brightness(1.5); }
+.ps-eye.off { background: #2b2b2b !important; }
+.ps-thumb { width: 42px; height: 32px; flex: none; display: grid; place-items: center; margin: 0 8px 0 2px; background: repeating-conic-gradient(#ccc 0 25%, #fff 0 50%) 0 0/8px 8px; border: 1px solid #111; }
+.ps-thumb canvas { width: 40px; height: 30px; display: block; }
+.ps-thumb.txt { background: #3a3a3a; color: #ddd; font: 700 16px 'Source Sans 3', sans-serif; }
+.ps-lrow .ps-lname { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #e6e6e6; margin: 0; }
+.ps-fxb { font: italic 700 11px 'Source Sans 3', serif; color: #ddd; margin: 0 4px; }
+.ps-lock { font-size: 11px; filter: grayscale(1) brightness(1.6); }
+.ps-fxrow { display: flex; flex-direction: column; padding: 2px 0 4px 82px; background: #2f2f2f; border-bottom: 1px solid #2a2a2a; }
+.ps-fxrow span { font-size: 11px; color: #bbb; line-height: 1.6; }
+.ps-rename { width: 100%; flex: 1; }
+.ps-lfoot { display: flex; justify-content: flex-end; gap: 2px; padding: 4px 8px; border-top: 1px solid var(--ai-line); flex: none; }
+.ps-lfoot button { width: 28px; height: 24px; border-radius: 3px; color: #ccc; font-size: 14px; }
+.ps-lfoot button[data-lcmd="fx"] { font: italic 700 13px 'Source Sans 3', serif; }
+.ps-lfoot button:hover { background: #474747; color: #fff; }
+.ps-fxmenu { display: flex; flex-direction: column; padding: 6px; }
+.ps-fxmenu button { text-align: left; padding: 6px 10px; border-radius: 3px; }
+.ps-fxmenu button:hover { background: #2f8ef0; color: #fff; }
+
+/* history */
+.ps-history { flex: 1; overflow-y: auto; }
+.ps-hrow { display: flex; align-items: center; gap: 8px; height: 28px; padding: 0 10px; border-bottom: 1px solid #2a2a2a; cursor: pointer; color: #ddd; }
+.ps-hrow:hover { background: #3a3a3a; }
+.ps-hrow.cur { background: #505050; color: #fff; }
+.ps-hrow.future { color: #777; font-style: italic; }
+.ps-hi { width: 16px; text-align: center; font-size: 11px; }
+
+/* adjustment dialog */
+.ps-adj { width: 330px; }
+.ps-slider { margin: 4px 0 12px; }
+.ps-slider > div { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; color: #ddd; }
+.ps-slider input[type=number] { width: 62px !important; height: 22px; background: var(--ai-input); border: 1px solid #111; border-radius: 3px; padding: 0 6px; }
+.ps-slider input[type=range] { width: 100%; accent-color: #ddd; }
+.ps-range-hue { background: linear-gradient(90deg, cyan, blue, magenta, red, yellow, lime, cyan); border-radius: 6px; height: 8px; appearance: none; -webkit-appearance: none; }
+.ps-prev { display: flex; align-items: center; gap: 6px; color: #ccc; margin-top: 4px; }
+.ps-zoomv { color: #ddd; padding: 1px 6px; border: 1px solid #555; border-radius: 2px; }
+.ai.ps .ai-dialog-body label span { width: 70px; }
+@media (max-width: 1100px) { .ps-dock { width: 240px; } .ps-hintline { display: none; } }

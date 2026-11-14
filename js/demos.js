@@ -397,6 +397,8 @@
   window.DQDemos = {
     get(name) { const f = DEMOS[name]; return f ? f() : ''; },
     has(name) { return !!DEMOS[name]; },
-    list: Object.keys(DEMOS),
+    get list() { return Object.keys(DEMOS); },
+    add(name, fn) { DEMOS[name] = fn; },
+    helpers: { C, D, at, op, ripple, frame, label, bbox, key, ARROW, WARROW, CROSS, PEN, IBEAM, DROP, HAND },
   };
 })();
