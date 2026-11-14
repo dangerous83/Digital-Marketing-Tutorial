@@ -1,14 +1,15 @@
 # DesignQuest Academy 🎨
 
 An interactive, beginner-friendly tutorial platform for graphic design.
-Students learn by **doing**. Every lesson has a built-in practice workspace that looks and works like **Adobe Illustrator** or **Adobe Photoshop**.
+Students learn by **doing**. Every lesson has a built-in practice workspace that looks and works like **Adobe Illustrator**, **Adobe Photoshop** or **Adobe After Effects**.
 
-> Two courses, 8 lessons each: **Adobe Illustrator** (vector: shapes, Pen tool, logos) and **Adobe Photoshop** (pixels: layers, selections, retouching, posters).
+> Three courses, 8 lessons each: **Adobe Illustrator** (vector: shapes, Pen tool, logos), **Adobe Photoshop** (pixels: layers, selections, retouching, posters) and **Adobe After Effects** (motion: keyframes, easing, effects, animated intros).
 
 ## What's inside
 
 | Feature | What students get |
 | --- | --- |
+| 🎬 **After Effects workspace simulator** | Composition viewer with motion paths, Timeline with layer bars, twirl-down Transform properties, stopwatches, keyframes you can select, drag and Easy Ease (F9), a draggable playhead and timecode, blue "scrubby" values, P/S/R/T/A/U shortcuts, shape and text layers, Typewriter, animation presets (Fade, Pop, Slide, Spin, Bounce, Blur In), effects (Gaussian Blur, Glow, Drop Shadow, Fill), parenting, layer timing and trimming, playback, and video export (WebM) |
 | 📷 **Photoshop workspace simulator** | Real pixel editing: layers (opacity, blend modes, drop shadow, stroke), locked Background, marquee / lasso / magic wand selections with marching ants, brush, eraser, clone stamp, spot healing, paint bucket, gradient, type layers, crop with ratios, Free Transform, adjustments (Brightness/Contrast, Hue/Saturation, Black & White, Photo Filter, Invert), filters (Gaussian Blur, Sharpen, Mosaic, Noise), History panel, open/place your own photos, export PNG/JPG |
 | 🖥️ **Illustrator workspace simulator** | Menu bar, control bar, toolbar with hidden-tool flyouts, rulers, artboard, Properties / Layers / Swatches / Color panels, status bar, keyboard shortcuts |
 | 🛠️ **Real working tools** | Selection, Direct Selection, Pen (curves + handles), Type, Line, Rectangle, Ellipse, Polygon, Star, Paintbrush, Pencil, Rotate, Eyedropper, Hand, Zoom |
@@ -39,6 +40,16 @@ Students learn by **doing**. Every lesson has a built-in practice workspace that
 7. Text & Layer Styles: Type tool, fonts, Stroke, Drop Shadow, blend modes
 8. Final Project: crop to a square, place an image, Free Transform, adjust, add a title, export a "Summer Sale" post
 
+### After Effects lessons
+1. Meet After Effects: play, scrub the timeline, the workspace, frames per second
+2. Keyframes 101: twirl open, the stopwatch, a second and third keyframe, motion path
+3. Transform Properties: Scale, Rotation, Opacity and the Anchor Point
+4. Easing: linear vs. Easy Ease, comparing them, timing, the Bounce preset
+5. Shapes & Text: Star tool, fill color, Type tool, the Typewriter preset
+6. Effects & Presets: Fade In, Drop Shadow, Glow, an animated blur
+7. Layers, Timing & Parenting: a moon orbiting a planet, layer timing, duplicate, hide
+8. Final Project: a 5-second animated channel intro exported as a video
+
 ## Run it
 
 No build step is needed. It is plain HTML, CSS and JavaScript.
@@ -59,6 +70,10 @@ css/app.css           Platform styles
 css/ai.css            Illustrator-style workspace styles
 js/editor.js          The Illustrator workspace simulator (tools, panels, menus)
 js/ps-editor.js       The Photoshop workspace simulator (canvas pixel editing)
+js/ae-editor.js       The After Effects workspace simulator (keyframe animation engine)
+js/ae-demos.js        After Effects explainer clips
+js/ae-lessons.js      After Effects course content
+css/ae.css            After Effects workspace styles
 js/ps-photos.js       Practice photos embedded as data URIs (pixel tools work offline too)
 js/demos.js           Animated explainer clips (pure SVG, no video files)
 js/ps-demos.js        Photoshop explainer clips

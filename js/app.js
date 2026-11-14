@@ -34,7 +34,7 @@
       host.className = 'ed-host';
       host.style.cssText = 'position:absolute;inset:0;';
       $('#playerHost').appendChild(host);
-      const E = kind === 'ps' ? window.PSEditor : window.AIEditor;
+      const E = kind === 'ps' ? window.PSEditor : kind === 'ae' ? window.AEEditor : window.AIEditor;
       const e = new E(host, {});
       e._host = host;
       e.on(onEditorEvent);
@@ -151,8 +151,8 @@
   function showExport(blob, name) {
     const url = URL.createObjectURL(blob);
     const box = modal(`<div class="big-badge">🎉</div><h2>Your file is ready!</h2>
-      <p>If the download didn't start, <b style="color:#fff">right-click</b> (or long-press) the picture and choose <b style="color:#fff">Save image</b>.</p>
-      <div class="modal-img" style="max-width:420px;background:#fff"><img src="${url}" alt="${esc(name)}"></div>
+      <p>If the download didn't start, <b style="color:#fff">right-click</b> (or long-press) the ${/^video/.test(blob.type) ? 'video' : 'picture'} and choose <b style="color:#fff">${/^video/.test(blob.type) ? 'Save video as' : 'Save image'}</b>.</p>
+      <div class="modal-img" style="max-width:480px;background:#fff">${/^video/.test(blob.type) ? `<video src="${url}" controls autoplay loop muted playsinline style="width:100%;display:block"></video>` : `<img src="${url}" alt="${esc(name)}">`}</div>
       <div class="modal-btns"><button class="btn btn-primary" data-ok>Done</button></div>`);
     box.querySelector('[data-ok]').onclick = closeModal;
   }
@@ -162,8 +162,20 @@
   function shortcutsModal(which) {
     const C = window.AIEditor.CMD, S = window.AIEditor.SHIFT, A = window.AIEditor.ALT;
     const g = (t, rows) => `<div class="sc-group"><h3>${t}</h3>${rows.map(([a, b]) => `<div class="sc-row"><span>${a}</span><span>${b.split(' ').map((k) => `<kbd>${esc(k)}</kbd>`).join(' ')}</span></div>`).join('')}</div>`;
-    const kind = typeof which === 'string' ? which : (document.body.classList.contains('in-player') ? edKind : (location.hash.includes('photoshop') ? 'ps' : 'ai'));
-    const tabs = `<div class="sc-tabs"><button class="btn ${kind === 'ai' ? 'btn-primary' : 'btn-soft'}" data-sck="ai">Illustrator</button><button class="btn ${kind === 'ps' ? 'btn-primary' : 'btn-soft'}" data-sck="ps">Photoshop</button></div>`;
+    const kind = typeof which === 'string' ? which : (document.body.classList.contains('in-player') ? edKind : (location.hash.includes('photoshop') ? 'ps' : location.hash.includes('aftereffects') ? 'ae' : 'ai'));
+    const tabs = `<div class="sc-tabs"><button class="btn ${kind === 'ai' ? 'btn-primary' : 'btn-soft'}" data-sck="ai">Illustrator</button><button class="btn ${kind === 'ps' ? 'btn-primary' : 'btn-soft'}" data-sck="ps">Photoshop</button><button class="btn ${kind === 'ae' ? 'btn-primary' : 'btn-soft'}" data-sck="ae">After Effects</button></div>`;
+    if (kind === 'ae') {
+      const box = modal(`<h2>⌨️ After Effects shortcuts</h2>${tabs}<p>After Effects is all about the keyboard — these will make you fast!</p>
+      <div class="sc-grid">
+        ${g('Show properties', [['Position', 'P'], ['Scale', 'S'], ['Rotation', 'R'], ['Opacity', 'T'], ['Anchor Point', 'A'], ['All keyframes', 'U']])}
+        ${g('Time', [['Play / Stop', 'Space'], ['First / last frame', 'Home End'], ['Next / previous frame', 'PgDn PgUp'], ['Previous / next keyframe', 'J K'], ['Move layer start here', '[']])}
+        ${g('Keyframes', [['Easy Ease', 'F9'], ['Select more', 'Shift click'], ['Delete keyframe', 'Del']])}
+        ${g('Tools', [['Selection', 'V'], ['Hand', 'H'], ['Zoom', 'Z'], ['Rotation', 'W'], ['Pan Behind (anchor)', 'Y'], ['Shapes', 'Q'], ['Type', C + 'T']])}
+        ${g('Layers & Comp', [['Duplicate layer', C + 'D'], ['New Solid', C + 'Y'], ['Comp Settings', C + 'K'], ['Undo', C + 'Z'], ['Export video', C + 'M']])}
+      </div>`, { wide: true });
+      box.querySelectorAll('[data-sck]').forEach((b) => b.onclick = () => shortcutsModal(b.dataset.sck));
+      return;
+    }
     if (kind === 'ps') {
       const box = modal(`<h2>⌨️ Photoshop shortcuts</h2>${tabs}<p>Learn the tool letters first — pros barely use the mouse for tools!</p>
       <div class="sc-grid">
@@ -206,7 +218,7 @@
     if (h.includes('/')) [page, a, b] = h.split('/'); // old-style links
     else if ((m = h.match(/^course-(.+)$/))) { page = 'course'; a = m[1]; }
     else if ((m = h.match(/^lesson-(.+?)(?:-s(\d+))?$/))) { page = 'lesson'; a = m[1]; b = m[2]; }
-    else if (h === 'playground' || h === 'playground-photoshop') { page = 'playground'; a = h === 'playground' ? 'illustrator' : 'photoshop'; }
+    else if (h === 'playground' || h === 'playground-photoshop' || h === 'playground-aftereffects') { page = 'playground'; a = h === 'playground' ? 'illustrator' : h.replace('playground-', ''); }
     leavePlayer();
     closeModal();
     $$('.view').forEach((v) => { v.hidden = true; });
@@ -258,7 +270,7 @@
     const p = lessonProgress(c);
     const R = 40, L = 2 * Math.PI * R;
     $('#courseHead').innerHTML = `<span class="ch-app" style="background:${c.bg};color:${c.color};border-color:${c.color}">${c.short}</span>
-      <div class="ch-text"><h1>${c.name}</h1><p>${c.status === 'open' ? `${c.lessons.length} playful lessons · ${c.id === 'photoshop' ? 'from zero to your first social media poster' : 'from zero to your first logo'}` : 'Coming soon!'}</p></div>
+      <div class="ch-text"><h1>${c.name}</h1><p>${c.status === 'open' ? `${c.lessons.length} playful lessons · ${c.goal || 'from zero to hero'}` : 'Coming soon!'}</p></div>
       ${c.status === 'open' ? `<div class="ring"><svg width="92" height="92"><circle cx="46" cy="46" r="${R}" stroke="rgba(255,255,255,.1)" stroke-width="9" fill="none"/><circle cx="46" cy="46" r="${R}" stroke="url(#rg)" stroke-width="9" fill="none" stroke-linecap="round" stroke-dasharray="${L}" stroke-dashoffset="${L * (1 - p.pct / 100)}"/><defs><linearGradient id="rg"><stop offset="0" stop-color="#19C3B1"/><stop offset="1" stop-color="#22C55E"/></linearGradient></defs></svg><b>${p.pct}%</b><small>complete</small></div>
       <a class="btn btn-primary btn-lg" href="#lesson-${(P.last && c.lessons.some((l) => l.id === P.last.lesson) && !P.done[P.last.lesson]) ? P.last.lesson + '-s' + P.last.step : nextLesson(c).id}">${p.done ? 'Continue →' : 'Start lesson 1 →'}</a>` : ''}`;
     if (c.status !== 'open') {
@@ -280,7 +292,7 @@
         </a></div>`;
     }).join('');
     $('#courseExtras').innerHTML = `
-      <a class="extra-card" href="#${c.id === 'photoshop' ? 'playground-photoshop' : 'playground'}"><span class="ei">${c.id === 'photoshop' ? '📷' : '🎨'}</span><div><h3>${appName(c)} Playground</h3><p>${c.id === 'photoshop' ? 'Edit any photo — even your own — with all the tools.' : 'Free drawing with all the tools + fun challenges.'}</p></div></a>
+      <a class="extra-card" href="#${c.id === 'illustrator' ? 'playground' : 'playground-' + c.id}"><span class="ei">${{ photoshop: '📷', aftereffects: '🎬' }[c.id] || '🎨'}</span><div><h3>${appName(c)} Playground</h3><p>${{ photoshop: 'Edit any photo — even your own — with all the tools.', aftereffects: 'Animate anything you like with all the tools + presets.' }[c.id] || 'Free drawing with all the tools + fun challenges.'}</p></div></a>
       <button class="extra-card" type="button" data-open="shortcuts"><span class="ei">⌨️</span><div><h3>Shortcut cheat sheet</h3><p>All the keys pros use, on one page.</p></div></button>
       <button class="extra-card" type="button" id="resetProgress"><span class="ei">♻️</span><div><h3>Reset my progress</h3><p>Start the course again from zero.</p></div></button>`;
     $('#courseExtras [data-open="shortcuts"]').onclick = () => shortcutsModal(c.editor || 'ai');
@@ -527,7 +539,7 @@
     g.fillText(name, W / 2 - 220, 500);
     g.strokeStyle = '#e4e2f2'; g.lineWidth = 3; g.beginPath(); g.moveTo(220, 535); g.lineTo(W - 660, 535); g.stroke();
     g.fillStyle = '#1d1b2e'; g.font = '600 34px Poppins, sans-serif'; g.fillText(`for completing the ${(S.certCourse || AI).name} Basics course`, W / 2 - 220, 610);
-    g.fillStyle = '#7a7896'; g.font = '400 26px Poppins, sans-serif'; g.fillText((S.certCourse || AI).id === 'photoshop' ? 'Layers · Selections · Brushes · Adjustments · Retouching · Type · Crop' : 'Shapes · Color · Pen Tool · Type · Layers · Pathfinder · Logo Design', W / 2 - 220, 660);
+    g.fillStyle = '#7a7896'; g.font = '400 26px Poppins, sans-serif'; g.fillText((S.certCourse || AI).skills || '', W / 2 - 220, 660);
     g.font = '56px serif';
     (S.certCourse || AI).lessons.forEach((l, i) => { g.fillText(l.badge.icon, 250 + i * 88, 790); });
     g.fillStyle = '#7a7896'; g.font = '500 24px Poppins, sans-serif';
@@ -651,14 +663,24 @@
     { e: '⚫', t: 'One color pop', d: 'Everything black & white except one object.', tips: ['Select the object (Lasso or Magic Wand).', 'Select › Inverse.', 'Image › Adjustments › Black & White.'] },
     { e: '🪧', t: 'Social media post', d: 'A square post with a bold title and a sticker.', tips: ['Crop 1:1.', 'Type tool + Bebas Neue + Stroke style.', 'Paint a circle sticker on a new layer with the Brush.'] },
   ];
+  const AE_CHALLENGES = [
+    { e: '🏀', t: 'Bouncing ball', d: 'Make a ball fall and bounce 3 times, getting smaller each time.', tips: ['Draw a circle (Q → Ellipse, Shift).', 'Try the Bounce Drop preset, then change the keyframes.', 'Select all keyframes and press F9.'] },
+    { e: '🪐', t: 'Solar system', d: 'Planets orbiting a sun using parenting.', tips: ['Sun in the middle: animate Rotation 0° → 360°.', 'Planets: set their Parent to the Sun.', 'Add Glow to the sun!'] },
+    { e: '🎉', t: 'Party title', d: 'A title that pops, spins and glows.', tips: ['Type your text.', 'Pop In + Spin presets.', 'Effect › Glow with a bright color.'] },
+    { e: '🌅', t: 'Sunrise scene', d: 'The sun rises behind hills while the sky changes.', tips: ['Composition Settings → dark blue background.', 'Big orange circle: animate Position up.', 'Rectangle hills on top (layer order!).'] },
+    { e: '🦩', t: 'Flamingo flight', d: 'Make the flamingo photo fly across the screen.', tips: ['Click Flamingo in the Project panel.', 'Animate Position along a curve with 3+ keyframes.', 'Add Rotation wiggles and Easy Ease.'] },
+    { e: '📺', t: 'Channel intro', d: 'A 5-second intro for your own channel.', tips: ['Logo shape + Pop In.', 'Channel name + Typewriter.', 'File › Export › Video to share it!'] },
+  ];
   function showPlayground(courseId = 'illustrator') {
-    const isPS = courseId === 'photoshop';
+    const isPS = courseId === 'photoshop', isAE = courseId === 'aftereffects';
+    const kind = isPS ? 'ps' : isAE ? 'ae' : 'ai';
     document.body.classList.add('in-player');
     $('#view-playground').hidden = false;
-    document.title = (isPS ? 'Photoshop' : 'Illustrator') + ' Playground · DesignQuest';
-    mountEditor($('#playHost'), isPS ? 'ps' : 'ai');
+    document.title = (isPS ? 'Photoshop' : isAE ? 'After Effects' : 'Illustrator') + ' Playground · DesignQuest';
+    mountEditor($('#playHost'), kind);
     S.lesson = null;
     if (isPS) ed.reset({ photo: 'landscape', name: 'my-photo' });
+    else if (isAE) ed.reset({ bg: '#14142B', layers: [{ kind: 'text', name: 'Animate me!', text: 'Animate me!', fsize: 80, props: { position: [480, 270] }, keys: { scale: [[0, [0, 0]], [0.4, [115, 115], 1], [0.6, [100, 100], 1]] } }] });
     else {
       ed.opts.storageKey = null;
       ed.reset();
@@ -666,17 +688,17 @@
       ed.loadLocal();
     }
     ed.fit();
-    const list = isPS ? PS_CHALLENGES : CHALLENGES;
+    const list = isPS ? PS_CHALLENGES : isAE ? AE_CHALLENGES : CHALLENGES;
     let open = -1;
     const render = () => {
-      $('#playBody').innerHTML = `<div class="pg-switch"><a class="btn ${isPS ? 'btn-soft' : 'btn-primary'}" href="#playground">✏️ Illustrator</a><a class="btn ${isPS ? 'btn-primary' : 'btn-soft'}" href="#playground-photoshop">📷 Photoshop</a></div>
-        <p class="coach-text" style="margin-top:4px">${isPS ? 'Edit any photo you like — try <b>File › Open Your Photo</b> to use your own! Need ideas? Pick a challenge:' : 'Draw anything you like! Your work is <b>saved automatically</b> in this browser. Need ideas? Pick a challenge:'}</p>
+      $('#playBody').innerHTML = `<div class="pg-switch"><a class="btn ${kind === 'ai' ? 'btn-primary' : 'btn-soft'}" href="#playground">✏️ Ai</a><a class="btn ${isPS ? 'btn-primary' : 'btn-soft'}" href="#playground-photoshop">📷 Ps</a><a class="btn ${isAE ? 'btn-primary' : 'btn-soft'}" href="#playground-aftereffects">🎬 Ae</a></div>
+        <p class="coach-text" style="margin-top:4px">${isPS ? 'Edit any photo you like — try <b>File › Open Your Photo</b> to use your own! Need ideas? Pick a challenge:' : isAE ? 'Animate anything! Press <b>Space</b> to play, use the <b>stopwatch</b> ⏱ to make keyframes, or try the presets. Need ideas? Pick a challenge:' : 'Draw anything you like! Your work is <b>saved automatically</b> in this browser. Need ideas? Pick a challenge:'}</p>
         ${list.map((c, i) => `<button type="button" class="challenge${open === i ? ' on' : ''}" data-i="${i}"><span class="ce">${c.e}</span><span><h4>${c.t}</h4><p>${c.d}</p>${open === i ? `<ul class="coach-text" style="margin:8px 0 0;padding-left:18px;font-size:12.5px">${c.tips.map((t) => `<li>${t}</li>`).join('')}</ul>` : ''}</span></button>`).join('')}
-        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:14px"><button class="btn btn-soft" id="pgClear" type="button">🧹 Clear</button><button class="btn btn-primary" id="pgExport" type="button">⬇ Export PNG</button><button class="btn btn-soft" type="button" data-open="shortcuts">⌨️ Shortcuts</button></div>`;
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:14px"><button class="btn btn-soft" id="pgClear" type="button">🧹 Clear</button><button class="btn btn-primary" id="pgExport" type="button">⬇ ${isAE ? 'Export Video' : 'Export PNG'}</button><button class="btn btn-soft" type="button" data-open="shortcuts">⌨️ Shortcuts</button></div>`;
       $$('#playBody .challenge').forEach((b) => b.addEventListener('click', () => { open = open === +b.dataset.i ? -1 : +b.dataset.i; render(); }));
-      $('#pgClear').onclick = () => { const clear = () => { if (isPS) ed.reset({ w: 1000, h: 700, name: 'Untitled-1' }); else { ed.reset(); ed.saveLocal(); } }; if (!ed.objs.length && !isPS) clear(); else ask(isPS ? 'Start over with an empty white canvas?' : 'Clear the whole artboard?', 'Clear', clear); };
-      $('#pgExport').onclick = () => ed.exportPNG();
-      $('#playBody [data-open="shortcuts"]').onclick = () => shortcutsModal(isPS ? 'ps' : 'ai');
+      $('#pgClear').onclick = () => { const clear = () => { if (isPS) ed.reset({ w: 1000, h: 700, name: 'Untitled-1' }); else if (isAE) ed.reset({ bg: '#14142B' }); else { ed.reset(); ed.saveLocal(); } }; if (!ed.objs.length && kind === 'ai') clear(); else ask(isPS ? 'Start over with an empty white canvas?' : isAE ? 'Start over with an empty composition?' : 'Clear the whole artboard?', 'Clear', clear); };
+      $('#pgExport').onclick = () => (isAE ? ed.exportVideo() : ed.exportPNG());
+      $('#playBody [data-open="shortcuts"]').onclick = () => shortcutsModal(kind);
     };
     render();
     maybeSmallScreen();
@@ -695,7 +717,7 @@
   // editor "Help" menu
   function onEditorHelp(ev, src) {
     if (ev.type !== 'help') return;
-    if (ev.what === 'shortcuts') shortcutsModal(src instanceof window.PSEditor ? 'ps' : 'ai');
+    if (ev.what === 'shortcuts') shortcutsModal(src instanceof window.PSEditor ? 'ps' : src instanceof window.AEEditor ? 'ae' : 'ai');
     else modal(`<div class="big-badge">🖋️</div><h2>Need help?</h2><p>Hover any tool to see what it does. In lessons, use the <b>💡 Hint</b> and <b>👀 Show me</b> buttons in the coach panel.</p><div class="modal-btns"><button class="btn btn-primary" data-x>Got it!</button></div>`).querySelector('[data-x]').onclick = closeModal;
   }
 
