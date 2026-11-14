@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>DesignQuest Academy</title>
+  <meta name="description" content="Learn graphic design by doing: interactive Adobe Illustrator lessons with a hands-on practice workspace, animations and missions.">
+  <meta name="theme-color" content="#12122a">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%23FF7A59'/%3E%3Cpath d='M32 10l14 24-6 18H24l-6-18z' fill='%23fff'/%3E%3Ccircle cx='32' cy='32' r='5' fill='%23FF7A59'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Lobster&family=Montserrat:wght@400;700;900&family=Pacifico&family=Playfair+Display:wght@400;700&family=Poppins:wght@300;400;500;600;700;800;900&family=Roboto+Mono:wght@400;700&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/app.css">
+  <link rel="stylesheet" href="css/ai.css">
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+
+  <!-- ============ Top navigation ============ -->
+  <header class="nav" id="nav">
+    <a class="brand" href="#/" aria-label="DesignQuest home">
+      <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 40 40"><rect width="40" height="40" rx="11" fill="#FF7A59"/><path d="M20 7l9 15-4 11h-10l-4-11z" fill="#fff"/><circle cx="20" cy="21" r="3.2" fill="#FF7A59"/><path d="M20 7v11" stroke="#FF7A59" stroke-width="1.6"/></svg></span>
+      <span class="brand-name">Design<b>Quest</b></span>
+    </a>
+    <nav class="nav-links" aria-label="Main">
+      <a href="#/" data-nav="home">Home</a>
+      <a href="#/course/illustrator" data-nav="course">Courses</a>
+      <a href="#/playground" data-nav="playground">Playground</a>
+      <button type="button" class="linklike" data-open="shortcuts">Shortcuts</button>
+    </nav>
+    <div class="nav-right">
+      <div class="xp-pill" title="Your experience points">
+        <span class="lvl" id="navLevel">Lv 1</span>
+        <span class="xp-bar"><i id="navXpBar"></i></span>
+        <span class="xp-num"><b id="navXp">0</b> XP</span>
+      </div>
+      <button type="button" class="icon-btn" id="soundBtn" aria-label="Toggle sound" title="Sound on/off">🔊</button>
+    </div>
+  </header>
+
+  <main id="main">
+    <!-- ============ HOME ============ -->
+    <section class="view" id="view-home" hidden>
+      <div class="hero">
+        <div class="hero-bg" aria-hidden="true">
+          <span class="blob b1"></span><span class="blob b2"></span><span class="blob b3"></span>
+          <svg class="float f1" viewBox="0 0 40 40"><path d="M20 3l5 11 12 1.6-9 8.4 2.4 12L20 30l-10.4 6 2.4-12-9-8.4L15 14z" fill="#FFC93C"/></svg>
+          <svg class="float f2" viewBox="0 0 40 40"><circle cx="20" cy="20" r="14" fill="none" stroke="#19C3B1" stroke-width="6"/></svg>
+          <svg class="float f3" viewBox="0 0 40 40"><rect x="6" y="6" width="28" height="28" rx="7" fill="#FF5FA2"/></svg>
+          <svg class="float f4" viewBox="0 0 60 30"><path d="M4 26C14 2 46 2 56 26" fill="none" stroke="#7C5CFF" stroke-width="4"/><rect x="0" y="22" width="8" height="8" fill="#fff" stroke="#7C5CFF" stroke-width="2"/><rect x="52" y="22" width="8" height="8" fill="#fff" stroke="#7C5CFF" stroke-width="2"/></svg>
+        </div>
+        <div class="hero-text">
+          <span class="eyebrow">✨ Graphic design for beginners</span>
+          <h1>Learn design by <span class="hl-word">doing it</span>, not just watching.</h1>
+          <p class="lead">Short, playful lessons with a <b>real practice workspace</b> built right in. Follow the coach, complete missions, earn XP and badges — and create your first logo!</p>
+          <div class="hero-cta">
+            <a class="btn btn-primary btn-lg" id="heroStart" href="#/course/illustrator">Start learning Illustrator →</a>
+            <a class="btn btn-ghost btn-lg" href="#/playground">Open the Playground</a>
+          </div>
+          <ul class="hero-facts">
+            <li><b>8</b> lessons</li><li><b>55+</b> hands-on steps</li><li><b>15</b> real tools</li><li><b>100%</b> free practice</li>
+          </ul>
+        </div>
+        <div class="hero-art">
+          <img src="assets/img/hero.webp" alt="A happy student creating colorful vector shapes on a laptop" width="1376" height="768">
+          <div class="hero-chip c1">🖋️ Pen Tool mastered!</div>
+          <div class="hero-chip c2">+50 XP</div>
+        </div>
+      </div>
+
+      <section class="section how">
+        <h2 class="section-title">How it works</h2>
+        <div class="how-grid">
+          <div class="how-card"><span class="how-num">1</span><div class="how-ico">👀</div><h3>Watch</h3><p>A tiny animation shows you the idea in seconds.</p></div>
+          <div class="how-card"><span class="how-num">2</span><div class="how-ico">🖱️</div><h3>Try</h3><p>Do the mission in a workspace that looks exactly like Illustrator.</p></div>
+          <div class="how-card"><span class="how-num">3</span><div class="how-ico">🏆</div><h3>Win</h3><p>The coach checks your work, you earn XP, badges and a certificate.</p></div>
+        </div>
+      </section>
+
+      <section class="section">
+        <h2 class="section-title">Choose your course</h2>
+        <div class="course-grid" id="courseGrid"></div>
+      </section>
+
+      <section class="section">
+        <h2 class="section-title">Your badges</h2>
+        <div class="badge-shelf" id="badgeShelf"></div>
+      </section>
+
+      <footer class="foot">
+        <p>DesignQuest Academy · Made for students who want to learn graphic design the fun way. This is an educational practice tool and is not affiliated with Adobe.</p>
+      </footer>
+    </section>
+
+    <!-- ============ COURSE ============ -->
+    <section class="view" id="view-course" hidden>
+      <div class="course-head" id="courseHead"></div>
+      <div class="roadmap" id="roadmap"></div>
+      <div class="extras" id="courseExtras"></div>
+    </section>
+
+    <!-- ============ LESSON PLAYER ============ -->
+    <section class="view view-player" id="view-player" hidden>
+      <div class="player">
+        <aside class="coach" id="coach" aria-label="Lesson coach">
+          <div class="coach-top">
+            <a class="coach-back" href="#/course/illustrator" aria-label="Back to course">←</a>
+            <div class="coach-title">
+              <small id="coachLessonNum">Lesson 1</small>
+              <strong id="coachLessonTitle">…</strong>
+            </div>
+            <button type="button" class="coach-collapse" id="coachCollapse" aria-label="Hide coach panel" title="Hide / show coach">⟨</button>
+          </div>
+          <div class="coach-progress" id="coachProgress" aria-hidden="true"></div>
+          <div class="coach-body" id="coachBody"></div>
+          <div class="coach-foot">
+            <button type="button" class="btn btn-soft" id="prevBtn">← Back</button>
+            <button type="button" class="skip-link" id="skipBtn">Skip</button>
+            <div class="mascot" id="mascot" aria-live="polite">
+            <div class="mascot-bubble" id="mascotSay">Let's go!</div>
+            <div class="mascot-face" aria-hidden="true">
+              <svg viewBox="0 0 64 64"><path d="M32 4l18 30-7 22H21l-7-22z" fill="#FF7A59" stroke="#fff" stroke-width="3" stroke-linejoin="round"/><circle cx="25" cy="32" r="4" fill="#fff"/><circle cx="39" cy="32" r="4" fill="#fff"/><circle class="pupil" cx="26" cy="33" r="2" fill="#1d1b2e"/><circle class="pupil" cx="40" cy="33" r="2" fill="#1d1b2e"/><path d="M26 42q6 5 12 0" stroke="#fff" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg>
+              </div>
+            </div>
+            <button type="button" class="btn btn-primary" id="nextBtn">Next →</button>
+          </div>
+        </aside>
+        <button type="button" class="coach-reopen" id="coachReopen" hidden>Coach ⟩</button>
+        <div class="workspace-host" id="playerHost"></div>
+      </div>
+    </section>
+
+    <!-- ============ PLAYGROUND ============ -->
+    <section class="view view-player" id="view-playground" hidden>
+      <div class="player">
+        <aside class="coach play-side">
+          <div class="coach-top">
+            <a class="coach-back" href="#/" aria-label="Back home">←</a>
+            <div class="coach-title"><small>Free practice</small><strong>Playground</strong></div>
+          </div>
+          <div class="coach-body" id="playBody"></div>
+        </aside>
+        <div class="workspace-host" id="playHost"></div>
+      </div>
+    </section>
+  </main>
+
+  <!-- overlays -->
+  <div class="spot" id="spot" hidden><span class="spot-label">Click here</span></div>
+  <div class="ghost" id="ghost" hidden><svg viewBox="0 0 24 24" width="26" height="26"><path d="M4 2v17l4.6-4.4 3.2 7.2 2.7-1.2-3.2-7.1 6.4-.1z" fill="#fff" stroke="#111" stroke-width="1.4" stroke-linejoin="round"/></svg><span class="ghost-key" hidden></span></div>
+  <canvas class="confetti" id="confetti" aria-hidden="true"></canvas>
+  <div class="xp-float" id="xpFloat" hidden>+10 XP</div>
+  <div class="modal-wrap" id="modal" hidden><div class="modal" role="dialog" aria-modal="true" id="modalBox"></div></div>
+  <div class="small-screen" id="smallScreen" hidden>
+    <p>💻 The practice workspace works best on a <b>laptop or desktop</b> with a mouse.</p>
+    <button type="button" class="btn btn-soft" id="smallScreenOk">Continue anyway</button>
+  </div>
+
+  <script src="js/vendor/paper-core.min.js"></script>
+  <script src="js/editor.js"></script>
+  <script src="js/demos.js"></script>
+  <script src="js/lessons.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
